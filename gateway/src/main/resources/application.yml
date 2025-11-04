@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: gateway
+
+server:
+  port: 8093
+
+routing:
+  microservice:
+    trucks: http://localhost:8090
+    clients: http://localhost:8091
+    shipping: http://localhost:8092

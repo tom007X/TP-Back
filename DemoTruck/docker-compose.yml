@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  mysql-db:
+    image: mysql:8.0.33 # Utiliza una versión estable de MySQL
+    container_name: mysql-dev-container
+    environment:
+      # --- Configuraciones Esenciales de MySQL ---
+      # La contraseña del usuario root
+      MYSQL_ROOT_PASSWORD: root_1
+      # El nombre de la base de datos que se creará al inicio
+      MYSQL_DATABASE: mi_basedatos_app
+      # El nombre del usuario que tendrá permisos en esa base de datos (opcional, pero buena práctica)
+      MYSQL_USER: user_1
+      # La contraseña del usuario anterior
+      MYSQL_PASSWORD: mi_usUario22
+    ports:
+      # Mapea el puerto interno (3306) al puerto de tu máquina local (3306)
+      - "3315:3306"
+    volumes:
+      # Persiste los datos en tu máquina local para que no se pierdan al detener el contenedor
+      - mysql_data:/var/lib/mysql
+      # [Opcional] Carga scripts SQL al inicio (ver explicación abajo)
+      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+
+# Volúmenes para persistir los datos
+volumes:
+  mysql_data:
