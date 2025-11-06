@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: Shipping-Microservice
+
+  datasource:
+    url: jdbc:mysql://localhost:3315/mi_basedatos_app?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: user_1
+    password: mi_usUario22
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update   # o 'create', 'none', según lo que necesites
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    show-sql: true
+server:
+  port: 8090
+
