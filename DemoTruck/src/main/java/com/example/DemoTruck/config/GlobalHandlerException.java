@@ -1,9 +1,8 @@
 package com.example.DemoTruck.config;
 
 import com.example.DemoTruck.exception.ApiErrorResponse;
-import com.example.DemoTruck.exception.DriverNotFoundException;
 import com.example.DemoTruck.exception.TruckDuplicateLicensePlate;
-import com.example.DemoTruck.exception.TruckNotFoundException;
+import com.example.DemoTruck.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,13 +12,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalHandlerException {
 
-    @ExceptionHandler(TruckNotFoundException.class)
-    public ResponseEntity<ApiErrorResponse> handleNotFoundException(TruckNotFoundException ex){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiErrorResponse(HttpStatus.NOT_FOUND.value(),"Not Found",ex.getMessage()));
-    }
-
-    @ExceptionHandler(DriverNotFoundException.class)
-    public ResponseEntity<ApiErrorResponse> handleNotFoundException(DriverNotFoundException ex){
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleNotFoundException(NotFoundException ex){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiErrorResponse(HttpStatus.NOT_FOUND.value(),"Not Found",ex.getMessage()));
     }
 

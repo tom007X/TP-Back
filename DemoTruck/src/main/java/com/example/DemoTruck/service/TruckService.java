@@ -1,7 +1,7 @@
 package com.example.DemoTruck.service;
 
 import com.example.DemoTruck.exception.TruckDuplicateLicensePlate;
-import com.example.DemoTruck.exception.TruckNotFoundException;
+import com.example.DemoTruck.exception.NotFoundException;
 import com.example.DemoTruck.model.Driver;
 import com.example.DemoTruck.model.Truck;
 import com.example.DemoTruck.repository.TruckRepositoryImp;
@@ -38,7 +38,7 @@ public class TruckService implements ServiceInterface<Truck,Long>{
 
     @Override
     public Truck findById(Long id) {
-        return repositoryImp.findById(id).orElseThrow(() -> new TruckNotFoundException(id));
+        return repositoryImp.findById(id).orElseThrow(() -> new NotFoundException(Truck.class.getSimpleName(), id));
     }
 
     @Override

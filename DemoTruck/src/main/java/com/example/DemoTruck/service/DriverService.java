@@ -1,6 +1,6 @@
 package com.example.DemoTruck.service;
 
-import com.example.DemoTruck.exception.DriverNotFoundException;
+import com.example.DemoTruck.exception.NotFoundException;
 import com.example.DemoTruck.model.Driver;
 import com.example.DemoTruck.repository.DriverRepositoryImp;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class DriverService implements ServiceInterface<Driver,Long>{
 
     @Override
     public Driver findById(Long id) {
-        return repositoryImp.findById(id).orElseThrow(()-> new DriverNotFoundException(id));
+        return repositoryImp.findById(id).orElseThrow(()-> new NotFoundException(Driver.class.getSimpleName(), id));
     }
 
     @Override
