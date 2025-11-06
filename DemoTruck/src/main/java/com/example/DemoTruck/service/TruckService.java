@@ -2,6 +2,7 @@ package com.example.DemoTruck.service;
 
 import com.example.DemoTruck.exception.TruckDuplicateLicensePlate;
 import com.example.DemoTruck.exception.TruckNotFoundException;
+import com.example.DemoTruck.model.Driver;
 import com.example.DemoTruck.model.Truck;
 import com.example.DemoTruck.repository.TruckRepositoryImp;
 import lombok.RequiredArgsConstructor;
@@ -14,15 +15,25 @@ import java.util.List;
 public class TruckService implements ServiceInterface<Truck,Long>{
 
     private final TruckRepositoryImp repositoryImp;
+    private final DriverService driverService;
 
     @Override
     public Truck save(Truck entity) {
-        boolean existe = repositoryImp.existsByLicensePlate(entity.getLicensePlate());
-        if (!existe) {
-            return repositoryImp.save(entity);
-        }else {
-          throw new TruckDuplicateLicensePlate(entity.getLicensePlate());
+        entity.setLicensePlate(entity.getLicensePlate().toUpperCase().trim());
+        boolean exists = repositoryImp.existsByLicensePlate(entity.getLicensePlate());
+        if (exists)
+            throw new TruckDuplicateLicensePlate(entity.getLicensePlate());
+        
+        if(entity.getDriver() != null ) {
+            if(entity.getDriver().getId() != null) {
+                Driver driver = driverService.findById(entity.getDriver().getId());
+                entity.setDriver(driver);
+            } else {
+                Driver newDriver = driverService.save(entity.getDriver());
+                entity.setDriver(newDriver);
+            }
         }
+        return repositoryImp.save(entity);
     }
 
     @Override

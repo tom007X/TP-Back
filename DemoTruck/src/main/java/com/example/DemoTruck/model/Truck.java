@@ -12,10 +12,12 @@ public class Truck {
     //AGREGAR UN PATRON DE PATENTE.
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "truck_id")
     private Long id;
 
     @Column(name = "license_plate", nullable = false, unique = true)
-    @Pattern(regexp = "(^[A-Z]{3}\\d{3}$)|(^[A-Z]{2}\\d{3}[A-Z]{2}$)", message = "Formato de patente inválido")
+    @Pattern(regexp = "(^[A-Z]{3}\\d{3}$)|(^[A-Z]{2}\\d{3}[A-Z]{2}$)", flags = Pattern.Flag.CASE_INSENSITIVE,
+        message = "Formato de patente inválido")
     @NotBlank
     private String licensePlate;
 
@@ -38,7 +40,7 @@ public class Truck {
     @Column(name = "is_available")
     private boolean isAvailable;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne()
     @JoinColumn(name = "driver_id")
     private Driver driver;
 

@@ -11,6 +11,7 @@ public class Driver {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "driver_id")
     private Long id;
 
     @Column(nullable = false)

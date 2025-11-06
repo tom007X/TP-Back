@@ -60,9 +60,9 @@ public class Section {
   @JoinColumn(name = "end_address_id")
   private Address endAddress;
 
-  // External microservice reference
-  @Column(name = "truck_id")
-  private Long truckId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "truck_id")
+  private Truck truckId;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "section_type_id")
