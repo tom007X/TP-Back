@@ -10,7 +10,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -18,17 +17,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "SECTION")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
-@ToString(exclude = "deposits")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Section {
 
   @Id
@@ -64,16 +60,19 @@ public class Section {
   @JoinColumn(name = "truck_id")
   private Truck truckId;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "section_type_id")
+  @Column(name = "section_type_id", nullable = false)
   private SectionType type;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "section_status_id", referencedColumnName = "section_state_id")
+  @Column(name = "section_status_id", nullable = false)
   private SectionStatus status;
 
-  // ---- Pure M:N (inverse side) ----
-  @ManyToMany(mappedBy = "sections", fetch = FetchType.LAZY)
-  @Builder.Default
-  private Set<Deposit> deposits = new LinkedHashSet<>();
+  @ManyToOne
+  @JoinColumn(name = "deposit_at_start_id")
+  private Deposit depositAtStart;
+
+  @ManyToOne
+  @JoinColumn(name = "deposit_at_end_id")
+  private Deposit depositAtEnd;
+
+  private Double distance;
 }

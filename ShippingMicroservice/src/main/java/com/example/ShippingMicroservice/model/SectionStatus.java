@@ -1,24 +1,57 @@
 package com.example.ShippingMicroservice.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.HashMap;
+import java.util.Map;
 
-@Entity
-@Table(name = "SECTION_STATUS")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
-public class SectionStatus {
-  @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "section_state_id")
-  private Long id;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-  private String status;
+public enum SectionStatus {
+  ESTIMADO(1, "estimado"),
+  ASIGNADO(2, "asignado"),
+  INICIADO(3, "iniciado"),
+  FINALIZADO(4, "finalizado");
+
+  private static final Map<Integer, SectionStatus> BY_CODE = new HashMap<>();
+  private static final Map<String, SectionStatus> BY_VALUE = new HashMap<>();
+  static {
+    for (SectionStatus s : values()) {
+      BY_CODE.put(s.code, s);
+      BY_VALUE.put(s.value, s);
+    }
+  }
+
+  private final int code;
+  private final String value;
+
+  SectionStatus(int code, String value) {
+    this.code = code;
+    this.value = value;
+  }
+
+  public int getCode() {
+    return code;
+  }
+
+  @JsonValue
+  public String getValue() {
+    return value;
+  }
+
+  public static SectionStatus fromCode(int code) {
+    SectionStatus s = BY_CODE.get(code);
+    if (s == null)
+      throw new IllegalArgumentException("Invalid SectionStatus code: " + code);
+    return s;
+  }
+
+  @JsonCreator
+  public static SectionStatus fromJson(Object v) {
+    if (v instanceof Number)
+      return fromCode(((Number) v).intValue());
+    SectionStatus s = BY_VALUE.get(String.valueOf(v));
+    if (s == null)
+      throw new IllegalArgumentException("Invalid SectionStatus: " + v);
+    return s;
+  }
 }

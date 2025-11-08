@@ -1,6 +1,5 @@
 package com.example.ShippingMicroservice.service;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.coyote.BadRequestException;
