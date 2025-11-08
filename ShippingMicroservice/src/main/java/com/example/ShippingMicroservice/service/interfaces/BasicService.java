@@ -1,8 +1,8 @@
-package com.example.ShippingMicroservice.service;
+package com.example.ShippingMicroservice.service.interfaces;
 
 import java.util.List;
 
-public interface ServiceInterface<E,I>{
+public interface BasicService<E,I>{
 
     E save(E entity);
     E findById(I id);

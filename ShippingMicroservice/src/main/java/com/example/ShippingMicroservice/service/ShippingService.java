@@ -7,12 +7,13 @@ import org.springframework.stereotype.Service;
 import com.example.ShippingMicroservice.exception.NotFoundException;
 import com.example.ShippingMicroservice.model.ShippingRequest;
 import com.example.ShippingMicroservice.repository.ShippingRequestRepositoryImpl;
+import com.example.ShippingMicroservice.service.interfaces.BasicService;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class ShippingService implements ServiceInterface<ShippingRequest, Long>{
+public class ShippingService implements BasicService<ShippingRequest, Long>{
     
     private final ShippingRequestRepositoryImpl repository;
     

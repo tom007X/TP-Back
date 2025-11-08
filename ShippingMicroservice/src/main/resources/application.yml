@@ -10,11 +10,16 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update   # o 'create', 'none', según lo que necesites
+      ddl-auto: create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
     show-sql: true
+    jpa:
+      defer-datasource-initialization: true
+    sql:
+      init:
+        mode: always
 server:
   port: 8090
 

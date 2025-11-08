@@ -25,6 +25,8 @@ public class Container {
   @Column(name = "container_id")
   private Long id;
 
+  private String code;
+
   private BigDecimal weight;
   private BigDecimal volume;
 

@@ -51,7 +51,6 @@ public class ShippingRequest {
   @JoinColumn(name = "container_id")
   private Container container;
 
-  // External microservice reference
   @Column(name = "client_id")
   private Long clientId;
 }

@@ -3,6 +3,8 @@ package com.example.ShippingMicroservice.service;
 import com.example.ShippingMicroservice.exception.NotFoundException;
 import com.example.ShippingMicroservice.model.Driver;
 import com.example.ShippingMicroservice.repository.DriverRepositoryImp;
+import com.example.ShippingMicroservice.service.interfaces.BasicService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +12,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class DriverService implements ServiceInterface<Driver,Long>{
+public class DriverService implements BasicService<Driver,Long>{
 
     private final DriverRepositoryImp repositoryImp;
 
