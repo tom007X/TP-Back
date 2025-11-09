@@ -9,7 +9,7 @@ import com.example.ShippingMicroservice.dto.ContainerRequestDTO;
 import com.example.ShippingMicroservice.exception.NotFoundException;
 import com.example.ShippingMicroservice.model.Container;
 import com.example.ShippingMicroservice.model.Deposit;
-import com.example.ShippingMicroservice.repository.ContainerRepositoryImpl;
+import com.example.ShippingMicroservice.repository.ContainerRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ContainerService {
-    private final ContainerRepositoryImpl containerRepository;
+    private final ContainerRepository containerRepository;
 
     @Transactional
     public Container create(ContainerRequestDTO dto) {

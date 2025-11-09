@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.ShippingMicroservice.model.Container;
 
-public interface ContainerRepositoryImpl extends JpaRepository<Container, Long> {
+public interface ContainerRepository extends JpaRepository<Container, Long> {
     boolean existsByCodeIgnoreCase(String code);
 
 

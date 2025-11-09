@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.ShippingMicroservice.model.Tariff;
 
-public interface TariffRepositoryImpl extends JpaRepository<Tariff, Long>{
+public interface TariffRepository extends JpaRepository<Tariff, Long>{
 
 }

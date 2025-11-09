@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.ShippingMicroservice.model.ShippingRequestStatus;
 
-public interface ShippingRequestStatusRepositoryImpl extends JpaRepository<ShippingRequestStatus, Long>{
+public interface ShippingRequestStatusRepository extends JpaRepository<ShippingRequestStatus, Long>{
 
 }

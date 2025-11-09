@@ -27,6 +27,7 @@ public class Deposit {
   @Column(name = "deposit_id")
   private Long id;
 
+  @Column(name = "name")
   private String name;
 
   @Column(name = "daily_storage_cost")

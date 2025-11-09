@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import com.example.ShippingMicroservice.dto.CoordinateDTO;
 import com.example.ShippingMicroservice.model.Address;
 
-public interface AddressRepositoryImpl extends JpaRepository<Address, Long> {
+public interface AddressRepository extends JpaRepository<Address, Long> {
 
     @Query("""
             select new com.example.ShippingMicroservice.dto.CoordinateDTO(a.latitude, a.longitude)

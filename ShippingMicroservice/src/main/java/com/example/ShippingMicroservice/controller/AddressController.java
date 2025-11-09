@@ -1,15 +1,15 @@
 package com.example.ShippingMicroservice.controller;
 
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.ShippingMicroservice.dto.AddressRequestDTO;
+import com.example.ShippingMicroservice.dto.AddressResponseDTO;
 import com.example.ShippingMicroservice.dto.CoordinateDTO;
-import com.example.ShippingMicroservice.model.Address;
 import com.example.ShippingMicroservice.service.AddressService;
 
 import java.util.List;
@@ -21,10 +21,30 @@ public class AddressController {
 
     private final AddressService service;
 
+    @GetMapping
+    public ResponseEntity<List<AddressResponseDTO>> findAll() {
+        List<AddressResponseDTO> addresses = service.findAll();
+        if (addresses.isEmpty())
+            return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(addresses);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<AddressResponseDTO> findOne(@PathVariable Long id) {
+        AddressResponseDTO address = service.findById(id);
+        return ResponseEntity.ok(address);
+    }
+
     @PostMapping
-    public ResponseEntity<Address> create(@Valid @RequestBody AddressRequestDTO dto) {
-        Address created = service.create(dto);
+    public ResponseEntity<AddressResponseDTO> create(@Valid @RequestBody AddressRequestDTO dto) {
+        AddressResponseDTO created = service.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<AddressResponseDTO> update(@PathVariable Long id, @Valid @RequestBody AddressRequestDTO dto) {
+        AddressResponseDTO updated = service.update(id, dto);
+        return ResponseEntity.status(HttpStatus.OK).body(updated);
     }
 
     @DeleteMapping("/{id}")
@@ -33,23 +53,11 @@ public class AddressController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Address> findOne(@PathVariable Long id) {
-        Address address = service.findById(id);
-        return ResponseEntity.ok(address);
-    }
-
-    @GetMapping
-    public ResponseEntity<List<Address>> findAll() {
-        List<Address> addresses = service.findAll();
-        if (addresses.isEmpty()) return ResponseEntity.noContent().build();
-        return ResponseEntity.ok(addresses);
-    }
-
     @GetMapping("/coordinates")
     public ResponseEntity<List<CoordinateDTO>> allCoordinates() {
         List<CoordinateDTO> coords = service.findAllCoordinates();
-        if (coords.isEmpty()) return ResponseEntity.noContent().build();
+        if (coords.isEmpty())
+            return ResponseEntity.noContent().build();
         return ResponseEntity.ok(coords);
     }
 

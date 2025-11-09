@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.example.ShippingMicroservice.model.Deposit;
 
-public interface DepositRepositoryImpl extends JpaRepository<Deposit, Long> {
+public interface DepositRepository extends JpaRepository<Deposit, Long> {
         boolean existsByNameIgnoreCase(String name);
 
         @Query("SELECT d FROM Deposit d WHERE " +

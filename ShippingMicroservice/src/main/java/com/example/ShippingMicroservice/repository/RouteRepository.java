@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.ShippingMicroservice.model.Route;
 
-public interface RouteRepositoryImpl extends JpaRepository<Route, Long>{
+public interface RouteRepository extends JpaRepository<Route, Long>{
 
 }

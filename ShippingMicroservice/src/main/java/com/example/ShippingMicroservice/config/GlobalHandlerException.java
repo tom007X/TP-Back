@@ -1,7 +1,11 @@
 package com.example.ShippingMicroservice.config;
 
 import com.example.ShippingMicroservice.exception.ApiErrorResponse;
+import com.example.ShippingMicroservice.exception.BadRequestException;
 import com.example.ShippingMicroservice.exception.TruckDuplicateLicensePlate;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import com.example.ShippingMicroservice.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +18,12 @@ public class GlobalHandlerException {
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleNotFoundException(NotFoundException ex){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiErrorResponse(HttpStatus.NOT_FOUND.value(),"Not Found",ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiErrorResponse(HttpStatus.NOT_FOUND.value(),"Not Found", ex.getMessage()));
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ApiErrorResponse> handleBadRequestException(BadRequestException ex){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiErrorResponse(HttpStatus.NOT_FOUND.value(),"Bad request", ex.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

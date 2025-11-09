@@ -8,9 +8,9 @@ import com.example.ShippingMicroservice.model.Address;
 import com.example.ShippingMicroservice.model.Deposit;
 import com.example.ShippingMicroservice.model.Route;
 import com.example.ShippingMicroservice.model.Section;
-import com.example.ShippingMicroservice.repository.DepositRepositoryImpl;
-import com.example.ShippingMicroservice.repository.RouteRepositoryImpl;
-import com.example.ShippingMicroservice.repository.SectionRepositoryImpl;
+import com.example.ShippingMicroservice.repository.DepositRepository;
+import com.example.ShippingMicroservice.repository.RouteRepository;
+import com.example.ShippingMicroservice.repository.SectionRepository;
 import com.example.ShippingMicroservice.service.interfaces.DirectionsService;
 
 import jakarta.transaction.Transactional;
@@ -20,9 +20,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RouteCreationService {
     
-    private final RouteRepositoryImpl routeRepository;
-    private final SectionRepositoryImpl sectionRepository;
-    private final DepositRepositoryImpl depositRepository;
+    private final RouteRepository routeRepository;
+    private final SectionRepository sectionRepository;
+    private final DepositRepository depositRepository;
     private final DirectionsService directionsService;
      
     /**

@@ -1,22 +1,20 @@
 package com.example.ShippingMicroservice.exception;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
 public class ApiErrorResponse {
 
-    private LocalDateTime fechaHora;
+    private LocalDateTime timestamp;
     private int status;
     private String error;
     private String message;
 
-    public ApiErrorResponse(int status, String error,String msg){
+    public ApiErrorResponse(int status, String error, String msg){
 
-        this.fechaHora = LocalDateTime.now();
+        this.timestamp = LocalDateTime.now();
         this.status = status;
         this.error = error;
         this.message = msg;

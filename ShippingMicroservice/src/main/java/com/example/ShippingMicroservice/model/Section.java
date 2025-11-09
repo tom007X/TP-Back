@@ -56,9 +56,8 @@ public class Section {
   @JoinColumn(name = "end_address_id")
   private Address endAddress;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "truck_id")
-  private Truck truckId;
+  @Column(name = "truck_id")
+  private Long truckId;
 
   @Column(name = "section_type_id", nullable = false)
   private SectionType type;
