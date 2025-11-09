@@ -28,9 +28,6 @@ public class RouteCreationService {
     private final DepositRepository depositRepository;
     private final DirectionsService directionsService;
 
-    /**
-     * Creates a route with optimal intermediate deposits using Google Maps API
-     */
     @Transactional
     public Route createRouteWithDeposits(Address startAddress, Address endAddress) {
         List<Deposit> availableDeposits = getDepositsInCircle(startAddress, endAddress);
@@ -49,7 +46,6 @@ public class RouteCreationService {
                 .mapToDouble(Double::doubleValue)
                 .sum();
 
-        // Create the route entity
         Route route = new Route();
         route.setStartAddress(startAddress);
         route.setEndAddress(endAddress);
@@ -59,7 +55,6 @@ public class RouteCreationService {
 
         Route savedRoute = routeRepository.save(route);
 
-        // Create sections with actual distances from Google Maps
         createSectionsWithDistances(savedRoute, startAddress, endAddress,
                 optimizedRoute.getSelectedDeposits(),
                 optimizedRoute.getSectionDistances());
@@ -67,48 +62,65 @@ public class RouteCreationService {
         return savedRoute;
     }
 
-    /**
-     * Creates sections with actual road distances
-     */
     private void createSectionsWithDistances(Route route, Address start, Address end,
             List<Deposit> deposits, List<Double> distances) {
+
         List<Section> sections = new ArrayList<>();
-        Address currentStart = start;
         int distanceIndex = 0;
 
-        // Create sections through each deposit
-        for (Deposit deposit : deposits) {
+        if (deposits.isEmpty()) {
+            Section directSection = new Section();
+            directSection.setRoute(route);
+            directSection.setStartAddress(start);
+            directSection.setEndAddress(end);
+            directSection.setStatus(SectionStatus.ASIGNADO);
+            directSection.setType(SectionType.ORIGEN_DESTINO);
+            if (distanceIndex < distances.size())
+                directSection.setDistance(distances.get(distanceIndex));
+            sections.add(directSection);
+            List<Section> savedSections = sectionRepository.saveAll(sections);
+            savedSections.stream().forEach(s -> route.addSection(s));
+            return;
+        }
+        Deposit currentDeposit = deposits.get(0);
+        Address currentStart = start;
+
+        for (int i = 0; i < deposits.size(); i++) {
+            Deposit deposit = deposits.get(i);
             Section section = new Section();
+
             section.setRoute(route);
             section.setStartAddress(currentStart);
             section.setEndAddress(deposit.getAddress());
             section.setDepositAtEnd(deposit);
             section.setStatus(SectionStatus.ASIGNADO);
-            section.setType(SectionType.DEPOSITO_DEPOSITO);
-
-            // Set actual distance if available
-            if (distanceIndex < distances.size()) {
+            if (distanceIndex < distances.size())
                 section.setDistance(distances.get(distanceIndex));
+            if (i == 0)
+                section.setType(SectionType.ORIGEN_DEPOSITO);
+            else {
+                section.setType(SectionType.DEPOSITO_DEPOSITO);
+                section.setDepositAtStart(currentDeposit);
             }
-
             sections.add(section);
             currentStart = deposit.getAddress();
+            currentDeposit = deposit;
             distanceIndex++;
         }
 
-        // Final section from last deposit to end
         Section finalSection = new Section();
         finalSection.setRoute(route);
         finalSection.setStartAddress(currentStart);
         finalSection.setEndAddress(end);
         finalSection.setStatus(SectionStatus.ASIGNADO);
-        finalSection.setType(SectionType.DEPOSITO_DEPOSITO);
+        finalSection.setType(SectionType.DEPOSITO_DESTINO);
         if (distanceIndex < distances.size()) {
             finalSection.setDistance(distances.get(distanceIndex));
         }
         sections.add(finalSection);
 
-        sectionRepository.saveAll(sections);
+        List<Section> savedSections = sectionRepository.saveAll(sections);
+        savedSections.stream().forEach(s -> route.addSection(s));
     }
 
     private List<Deposit> filterIntermediateDeposits(List<Deposit> deposits,

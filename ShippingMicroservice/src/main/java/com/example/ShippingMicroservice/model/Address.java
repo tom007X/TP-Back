@@ -1,5 +1,9 @@
 package com.example.ShippingMicroservice.model;
 
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,4 +34,10 @@ public class Address {
 
   private Double latitude;
   private Double longitude;
+
+  public String getFullAddress() {
+    return Stream.of(this.street, this.number, this.city, this.postalCode)
+      .filter(Objects::nonNull)
+      .collect(Collectors.joining(" "));
+  }
 }

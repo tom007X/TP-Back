@@ -3,6 +3,8 @@ package com.example.ShippingMicroservice.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.example.ShippingMicroservice.model.Route;
+import com.example.ShippingMicroservice.model.ShippingRequest;
 import com.example.ShippingMicroservice.model.ShippingRequestStatus;
 
 import lombok.Builder;
@@ -21,4 +23,27 @@ public class ShippingRequestResponseDTO {
     private Long containerId;
     private Long clientId;
     private RouteDTO route;
+
+    public static ShippingRequestResponseDTO fromEntity(ShippingRequest request, Route route) {
+
+        ShippingRequestResponseDTO res = ShippingRequestResponseDTO.fromEntity(request);
+        RouteDTO routeDTO = route != null ? RouteDTO.fromEntity(route) : null;
+        res.route = routeDTO;
+
+        return res;
+    }
+
+    public static ShippingRequestResponseDTO fromEntity(ShippingRequest request) {
+        return ShippingRequestResponseDTO.builder()
+                .id(request.getId())
+                .requestDatetime(request.getRequestDatetime())
+                .estimatedCost(request.getEstimatedCost())
+                .estimatedTime(request.getEstimatedTime())
+                .finalCost(request.getFinalCost())
+                .realTime(request.getRealTime())
+                .status(request.getStatus())
+                .containerId(request.getContainer() != null ? request.getContainer().getId() : null)
+                .clientId(request.getClientId())
+                .build();
+    }
 }

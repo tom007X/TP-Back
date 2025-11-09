@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 
 import com.example.ShippingMicroservice.dto.AddressRequestDTO;
 import com.example.ShippingMicroservice.dto.CreateShippingRequestDTO;
-import com.example.ShippingMicroservice.dto.RouteDTO;
 import com.example.ShippingMicroservice.dto.ShippingRequestResponseDTO;
 import com.example.ShippingMicroservice.exception.BadRequestException;
+import com.example.ShippingMicroservice.exception.NotFoundException;
 import com.example.ShippingMicroservice.model.Address;
 import com.example.ShippingMicroservice.model.Container;
 import com.example.ShippingMicroservice.model.ContainerStatus;
@@ -63,21 +63,20 @@ public class ShippingRequestService {
 
         ShippingRequest saved = shippingRequestRepository.save(shippingRequest);
 
-        return mapToResponseDTO(saved, route);
+        return ShippingRequestResponseDTO.fromEntity(saved, route);
     }
 
 
     @Transactional(readOnly = true)
     public ShippingRequestResponseDTO getShippingRequest(Long id, Long clientId) {
         ShippingRequest request = shippingRequestRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Shipping request not found with ID: " + id));
+                .orElseThrow(() -> new NotFoundException("ShippingRequest", id));
 
         if (!request.getClientId().equals(clientId)) {
             throw new SecurityException("Access denied to this shipping request");
         }
 
-        return mapToResponseDTO(request, null);
+        return ShippingRequestResponseDTO.fromEntity(request);
     }
 
 
@@ -87,15 +86,14 @@ public class ShippingRequestService {
                 .findByClientIdOrderByRequestDatetimeDesc(clientId);
 
         return requests.stream()
-                .map(request -> mapToResponseDTO(request, null))
+                .map(request -> ShippingRequestResponseDTO.fromEntity(request))
                 .collect(Collectors.toList());
     }
 
     @Transactional
     public ShippingRequestResponseDTO cancelShippingRequest(Long id, Long clientId) {
         ShippingRequest request = shippingRequestRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Shipping request not found with ID: " + id));
+                .orElseThrow(() -> new NotFoundException("ShippingRequest", id));
 
         if (!request.getClientId().equals(clientId)) {
             throw new SecurityException("Access denied to this shipping request");
@@ -111,7 +109,7 @@ public class ShippingRequestService {
         request.setStatus(ShippingRequestStatus.CANCELADO);
         ShippingRequest updated = shippingRequestRepository.save(request);
 
-        return mapToResponseDTO(updated, null);
+        return ShippingRequestResponseDTO.fromEntity(updated);
     }
 
     private Address createOrFindAddress(AddressRequestDTO dto) {
@@ -129,25 +127,4 @@ public class ShippingRequestService {
         return container.getStatus() == ContainerStatus.LIBRE;
     }
 
-    private ShippingRequestResponseDTO mapToResponseDTO(ShippingRequest request, Route route) {
-        RouteDTO routeDTO = RouteDTO.builder()
-                .id(route.getId())
-                .numDeposits(route.getNumDeposit())
-                .numSections(route.getNumSections())
-                .totalDistance(route.getTotalDistance())
-                .build();
-        ShippingRequestResponseDTO dto = ShippingRequestResponseDTO.builder()
-                .id(request.getId())
-                .requestDatetime(request.getRequestDatetime())
-                .estimatedCost(request.getEstimatedCost())
-                .estimatedTime(request.getEstimatedTime())
-                .finalCost(request.getFinalCost())
-                .realTime(request.getRealTime())
-                .status(request.getStatus())
-                .containerId(request.getContainer() != null ? request.getContainer().getId() : null)
-                .clientId(request.getClientId())
-                .route(routeDTO)
-                .build();
-        return dto;
-    }
 }

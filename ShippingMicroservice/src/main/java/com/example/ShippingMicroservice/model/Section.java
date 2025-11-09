@@ -75,4 +75,16 @@ public class Section {
 
   @Column(name = "distance")
   private Double distance;
+
+  public String getStartLocation() {
+    if (depositAtStart != null)
+      return depositAtStart.getName();
+    return startAddress.getFullAddress();
+  }
+
+  public String getEndLocation() {
+    if (depositAtEnd != null)
+      return depositAtEnd.getName();
+    return endAddress.getFullAddress();
+  }
 }
