@@ -14,6 +14,7 @@ import com.example.ShippingMicroservice.dto.ShippingRequestResponseDTO;
 import com.example.ShippingMicroservice.exception.BadRequestException;
 import com.example.ShippingMicroservice.model.Address;
 import com.example.ShippingMicroservice.model.Container;
+import com.example.ShippingMicroservice.model.ContainerStatus;
 import com.example.ShippingMicroservice.model.Route;
 import com.example.ShippingMicroservice.model.ShippingRequest;
 import com.example.ShippingMicroservice.model.ShippingRequestStatus;
@@ -36,27 +37,22 @@ public class ShippingRequestService {
 
     @Transactional
     public ShippingRequestResponseDTO createShippingRequest(CreateShippingRequestDTO dto) {
-        // Validate container exists and is available
         Container container = containerRepository.findById(dto.getContainerId())
                 .orElseThrow(() -> new BadRequestException(
                         "Container not found with ID: " + dto.getContainerId()));
 
         if (!isContainerAvailable(container)) {
-            throw new IllegalStateException("Container is not available for shipping");
+            throw new BadRequestException("Container is not available for shipping");
         }
 
-        // Create or find addresses
         Address startAddress = createOrFindAddress(dto.getStartAddress());
         Address endAddress = createOrFindAddress(dto.getEndAddress());
 
-        // Create optimized route with deposits
         Route route = routeCreationService.createRouteWithDeposits(startAddress, endAddress);
 
-        // Calculate estimated cost and time
         BigDecimal estimatedCost = costCalculationService.calculateCost(route, container);
         String estimatedTime = costCalculationService.calculateEstimatedTime(route);
 
-        // Create shipping request
         ShippingRequest shippingRequest = new ShippingRequest();
         shippingRequest.setRequestDatetime(LocalDateTime.now());
         shippingRequest.setEstimatedCost(estimatedCost);
@@ -70,16 +66,13 @@ public class ShippingRequestService {
         return mapToResponseDTO(saved, route);
     }
 
-    /**
-     * Gets a shipping request by ID
-     */
+
     @Transactional(readOnly = true)
     public ShippingRequestResponseDTO getShippingRequest(Long id, Long clientId) {
         ShippingRequest request = shippingRequestRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Shipping request not found with ID: " + id));
 
-        // Verify the request belongs to the client
         if (!request.getClientId().equals(clientId)) {
             throw new SecurityException("Access denied to this shipping request");
         }
@@ -87,9 +80,7 @@ public class ShippingRequestService {
         return mapToResponseDTO(request, null);
     }
 
-    /**
-     * Gets all shipping requests for a client
-     */
+
     @Transactional(readOnly = true)
     public List<ShippingRequestResponseDTO> getShippingRequestsByClient(Long clientId) {
         List<ShippingRequest> requests = shippingRequestRepository
@@ -100,21 +91,17 @@ public class ShippingRequestService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Cancels a shipping request
-     */
     @Transactional
     public ShippingRequestResponseDTO cancelShippingRequest(Long id, Long clientId) {
         ShippingRequest request = shippingRequestRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Shipping request not found with ID: " + id));
 
-        // Verify the request belongs to the client
         if (!request.getClientId().equals(clientId)) {
             throw new SecurityException("Access denied to this shipping request");
         }
 
-        // Check if request can be cancelled
+
         if (request.getStatus() == ShippingRequestStatus.FINALIZADO ||
                 request.getStatus() == ShippingRequestStatus.CANCELADO) {
             throw new IllegalStateException(
@@ -127,9 +114,6 @@ public class ShippingRequestService {
         return mapToResponseDTO(updated, null);
     }
 
-    /**
-     * Creates or finds an existing address
-     */
     private Address createOrFindAddress(AddressRequestDTO dto) {
         Address existing = addressRepository.findByLatitudeAndLongitude(
                 dto.getLatitude(), dto.getLongitude());
@@ -137,29 +121,20 @@ public class ShippingRequestService {
         if (existing != null)
             return existing;
 
-        // Create new address
         Address address = AddressRequestDTO.toEntity(dto);
         return addressRepository.save(address);
     }
 
-    /**
-     * Checks if container is available for shipping
-     */
     private boolean isContainerAvailable(Container container) {
-        // Add your business logic here
-        // For example: check if container is not already assigned to another active
-        // request
-        return true;
+        return container.getStatus() == ContainerStatus.LIBRE;
     }
 
-    /**
-     * Maps ShippingRequest entity to response DTO
-     */
     private ShippingRequestResponseDTO mapToResponseDTO(ShippingRequest request, Route route) {
         RouteDTO routeDTO = RouteDTO.builder()
                 .id(route.getId())
                 .numDeposits(route.getNumDeposit())
                 .numSections(route.getNumSections())
+                .totalDistance(route.getTotalDistance())
                 .build();
         ShippingRequestResponseDTO dto = ShippingRequestResponseDTO.builder()
                 .id(request.getId())

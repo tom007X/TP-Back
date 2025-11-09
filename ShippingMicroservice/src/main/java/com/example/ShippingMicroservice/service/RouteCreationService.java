@@ -2,6 +2,7 @@ package com.example.ShippingMicroservice.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import com.example.ShippingMicroservice.model.Address;
@@ -37,14 +38,16 @@ public class RouteCreationService {
         List<Deposit> intermediateDeposits = filterIntermediateDeposits(
                 availableDeposits, startAddress, endAddress);
 
-        if (intermediateDeposits.isEmpty()) {
-            throw new IllegalStateException("No intermediate deposits found between start and end addresses");
-        }
-
         var optimizedRoute = directionsService.optimize(
                 startAddress,
                 endAddress,
                 intermediateDeposits);
+
+        double totalDistance = optimizedRoute.getSectionDistances()
+                .stream()
+                .filter(Objects::nonNull)
+                .mapToDouble(Double::doubleValue)
+                .sum();
 
         // Create the route entity
         Route route = new Route();
@@ -52,6 +55,7 @@ public class RouteCreationService {
         route.setEndAddress(endAddress);
         route.setNumDeposit(optimizedRoute.getSelectedDeposits().size());
         route.setNumSections(optimizedRoute.getSelectedDeposits().size() + 1);
+        route.setTotalDistance(totalDistance);
 
         Route savedRoute = routeRepository.save(route);
 
@@ -107,9 +111,6 @@ public class RouteCreationService {
         sectionRepository.saveAll(sections);
     }
 
-    /**
-     * Filters out deposits that are at the start or end addresses
-     */
     private List<Deposit> filterIntermediateDeposits(List<Deposit> deposits,
             Address startAddress,
             Address endAddress) {
@@ -119,23 +120,17 @@ public class RouteCreationService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Checks if two addresses are at the same location
-     */
     private boolean isSameLocation(Address addr1, Address addr2) {
         if (addr1.getId() != null && addr2.getId() != null &&
                 addr1.getId().equals(addr2.getId())) {
             return true;
         }
 
-        double TOLERANCE = 0.00001;
+        double TOLERANCE = 0.0001;
         return Math.abs(addr1.getLatitude() - addr2.getLatitude()) < TOLERANCE &&
                 Math.abs(addr1.getLongitude() - addr2.getLongitude()) < TOLERANCE;
     }
 
-    /**
-     * Calculates distance using Haversine formula (for fallback)
-     */
     private double calculateDistance(Address a1, Address a2) {
         double lat1 = Math.toRadians(a1.getLatitude());
         double lat2 = Math.toRadians(a2.getLatitude());
@@ -154,9 +149,6 @@ public class RouteCreationService {
         return 6371 * c;
     }
 
-    /**
-     * Calculates midpoint for circular search
-     */
     private Address calculateMidpoint(Address start, Address end) {
         Address midpoint = new Address();
         midpoint.setLatitude((start.getLatitude() + end.getLatitude()) / 2);
@@ -164,9 +156,6 @@ public class RouteCreationService {
         return midpoint;
     }
 
-    /**
-     * Gets deposits within circular area
-     */
     private List<Deposit> getDepositsInCircle(Address start, Address end) {
         Address center = calculateMidpoint(start, end);
         double radius = calculateDistance(start, end) / 2;

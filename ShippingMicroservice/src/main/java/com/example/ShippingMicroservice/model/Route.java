@@ -30,6 +30,9 @@ public class Route {
   @Column(name = "num_deposit")
   private Integer numDeposit;
 
+  @Column(name = "total_distance_km")
+  private Double totalDistance;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "request_id")
   private ShippingRequest request;

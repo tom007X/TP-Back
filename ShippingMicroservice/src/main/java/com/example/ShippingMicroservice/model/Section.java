@@ -73,5 +73,6 @@ public class Section {
   @JoinColumn(name = "deposit_at_end_id")
   private Deposit depositAtEnd;
 
+  @Column(name = "distance")
   private Double distance;
 }
