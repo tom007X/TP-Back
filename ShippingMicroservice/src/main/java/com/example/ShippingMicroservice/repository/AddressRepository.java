@@ -17,4 +17,6 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
             """)
     List<CoordinateDTO> findAllCoordinates();
 
+    Address findByLatitudeAndLongitude(Double latitude, Double longitude);
+
 }

@@ -1,4 +1,5 @@
 package com.example.ShippingMicroservice.utils;
+
 import com.example.ShippingMicroservice.model.SectionStatus;
 
 import jakarta.persistence.AttributeConverter;
@@ -10,6 +11,7 @@ public class SectionStatusCodeConverter implements AttributeConverter<SectionSta
     public Integer convertToDatabaseColumn(SectionStatus attribute) {
         return attribute == null ? null : attribute.getCode();
     }
+
     @Override
     public SectionStatus convertToEntityAttribute(Integer dbData) {
         return dbData == null ? null : SectionStatus.fromCode(dbData);

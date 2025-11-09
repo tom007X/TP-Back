@@ -29,7 +29,23 @@ ON DUPLICATE KEY UPDATE name = VALUES(name);
 
 SET FOREIGN_KEY_CHECKS = 1;
 
--- 10 ADDRESSES (Argentina)
+
+-- 4 DRIVERS
+INSERT INTO driver (name, surname, phone) VALUES
+('Martín',   'González',  '+54 9 351 555-0101'),
+('Lucía',    'Fernández', '+54 9 11 4444-0202'),
+('Sofía',    'Pereyra',   '+54 9 341 333-0303'),
+('Diego',    'Suárez',    '+54 9 261 222-0404');
+
+-- 5 TRUCKS (mix old ABC123 and new AA123AA formats; unique license_plate)
+-- Link some trucks to drivers via driver_id 1..4 (adjust if your PKs start elsewhere)
+INSERT INTO truck (license_plate, driver_id, max_weight, max_volume, cost_per_km, fuel_consuptiom_per_km, is_available) VALUES
+('ABC123',   1,    12000, 38.5, 350.00, 0.32, 1),
+('AA123AA',  2,    14000, 45.0, 380.00, 0.34, 1),
+('ACB987',   3,    10000, 30.0, 320.00, 0.28, 1),
+('AB234CD',  4,    16000, 50.0, 410.00, 0.36, 0),
+('ZZZ001',   NULL,  8000, 24.0, 300.00, 0.26, 1);
+
 INSERT INTO address (city, postal_code, street, number, latitude, longitude) VALUES
 ('Córdoba',                '5000', 'Av. Colón',             '1234', -31.4045, -64.2070), -- 1
 ('Buenos Aires',           'C1425','Av. Santa Fe',          '3456', -34.5884, -58.4055), -- 2
@@ -62,25 +78,6 @@ INSERT INTO address (city, postal_code, street, number, latitude, longitude) VAL
 ('Catamarca',              '4700', 'Rivadavia',             '430',  -28.4696, -65.7852),  -- 29
 ('Santiago del Estero',    '4200', 'Belgrano',              '980',  -27.7844, -64.2642);  -- 30
 
-
--- 4 DRIVERS
-INSERT INTO driver (name, surname, phone) VALUES
-('Martín',   'González',  '+54 9 351 555-0101'),
-('Lucía',    'Fernández', '+54 9 11 4444-0202'),
-('Sofía',    'Pereyra',   '+54 9 341 333-0303'),
-('Diego',    'Suárez',    '+54 9 261 222-0404');
-
--- 5 TRUCKS (mix old ABC123 and new AA123AA formats; unique license_plate)
--- Link some trucks to drivers via driver_id 1..4 (adjust if your PKs start elsewhere)
-INSERT INTO truck (license_plate, driver_id, max_weight, max_volume, cost_per_km, fuel_consuptiom_per_km, is_available) VALUES
-('ABC123',   1,    12000, 38.5, 350.00, 0.32, 1),
-('AA123AA',  2,    14000, 45.0, 380.00, 0.34, 1),
-('ACB987',   3,    10000, 30.0, 320.00, 0.28, 1),
-('AB234CD',  4,    16000, 50.0, 410.00, 0.36, 0),
-('ZZZ001',   NULL,  8000, 24.0, 300.00, 0.26, 1);
-
--- 10 DEPOSITS, each tied to one of the addresses above
--- Using a simple label as deposit.name; address_id references the inserted address rows (1..10 if auto-inc starts at 1)
 INSERT INTO deposit (name, address_id, daily_storage_cost) VALUES
 ('Depósito Córdoba Colón',                   1, 10000),
 ('Depósito BA Santa Fe',                     2, 20000),
@@ -112,3 +109,10 @@ INSERT INTO deposit (name, address_id, daily_storage_cost) VALUES
 ('Depósito Formosa 25 de Mayo',             28, 9000),
 ('Depósito Catamarca Rivadavia',            29, 8800),
 ('Depósito Santiago del Estero Belgrano',   30, 9200);
+
+INSERT INTO container (code, weight, volume, container_state_id, client_id) VALUES
+('CONT001', 2000, 12.5, 1, 1),
+('CONT002', 1500, 10.0, 2, 2),
+('CONT003', 3000, 15.0, 3, 3),
+('CONT004', 2500, 13.0, 1, 4),
+('CONT005', 1800, 11.0, 2, 5);

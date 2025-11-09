@@ -22,9 +22,9 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class GoogleMapsDirectionsService implements DirectionsService{
+public class GoogleMapsDirectionsService implements DirectionsService {
 
-     private final RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
     private final GoogleMapsProperties properties;
 
     private static final int MAX_OPTIMIZABLE_WAYPOINTS = 5;
@@ -33,19 +33,21 @@ public class GoogleMapsDirectionsService implements DirectionsService{
     public OptimizedRouteResult optimize(Address start, Address end, List<Deposit> waypoints) {
         List<Deposit> limited = waypoints == null ? List.of()
                 : waypoints.subList(0, Math.min(waypoints.size(), MAX_OPTIMIZABLE_WAYPOINTS));
+        String directionsUrl = properties.directionsUrl();
+        String apiKey = properties.apiKey();
 
         URI uri = UriComponentsBuilder
-                .fromUriString(properties.getDirectionsUrl())
+                .fromUriString(directionsUrl)
                 .queryParam("origin", toCoordinates(start))
                 .queryParam("destination", toCoordinates(end))
                 .queryParam("waypoints", buildWaypointsParam(limited))
-                .queryParam("key", properties.getApiKey())
-                .build(true) // keep commas/pipes
+                .queryParam("key", apiKey)
+                .build()
                 .toUri();
 
         try {
-            ResponseEntity<GoogleMapsDirectionsResponse> resp =
-                    restTemplate.getForEntity(uri, GoogleMapsDirectionsResponse.class);
+            ResponseEntity<GoogleMapsDirectionsResponse> resp = restTemplate.getForEntity(uri,
+                    GoogleMapsDirectionsResponse.class);
 
             GoogleMapsDirectionsResponse body = resp.getBody();
             if (body == null || !"OK".equalsIgnoreCase(body.getStatus())) {
@@ -65,7 +67,8 @@ public class GoogleMapsDirectionsService implements DirectionsService{
     }
 
     private String buildWaypointsParam(List<Deposit> waypoints) {
-        if (waypoints.isEmpty()) return "optimize:true";
+        if (waypoints.isEmpty())
+            return "optimize:true";
         String joined = waypoints.stream()
                 .map(d -> d.getAddress())
                 .map(this::toCoordinates)
@@ -74,9 +77,9 @@ public class GoogleMapsDirectionsService implements DirectionsService{
     }
 
     private OptimizedRouteResult parse(GoogleMapsDirectionsResponse response,
-                                       List<Deposit> candidateWaypoints,
-                                       Address start,
-                                       Address end) {
+            List<Deposit> candidateWaypoints,
+            Address start,
+            Address end) {
         // Take the first route
         var routes = response.getRoutes();
         if (routes == null || routes.isEmpty()) {
@@ -105,8 +108,10 @@ public class GoogleMapsDirectionsService implements DirectionsService{
             });
         }
 
-        // Ensure we have exactly (waypoints + 1) legs (start->w1, w1->w2, ..., last->end)
-        // If not, we simply trust the API’s legs; consumers should handle size mismatches gracefully.
+        // Ensure we have exactly (waypoints + 1) legs (start->w1, w1->w2, ...,
+        // last->end)
+        // If not, we simply trust the API’s legs; consumers should handle size
+        // mismatches gracefully.
         return new OptimizedRouteResult(optimizedDeposits, legDistancesKm);
     }
 

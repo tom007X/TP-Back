@@ -1,5 +1,6 @@
 package com.example.ShippingMicroservice.dto;
 
+import com.example.ShippingMicroservice.model.Address;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -24,5 +25,16 @@ public class AddressRequestDTO {
     @Min(-180)
     @Max(180)
     private Double longitude;
+
+    public static Address toEntity(AddressRequestDTO dto) {
+        return Address.builder()
+                .city(dto.getCity())
+                .postalCode(dto.getPostalCode())
+                .street(dto.getStreet())
+                .number(dto.getNumber())
+                .latitude(dto.getLatitude())
+                .longitude(dto.getLongitude())
+                .build();
+    }
 
 }

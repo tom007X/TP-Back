@@ -4,7 +4,6 @@ import com.example.ShippingMicroservice.exception.ApiErrorResponse;
 import com.example.ShippingMicroservice.exception.BadRequestException;
 import com.example.ShippingMicroservice.exception.TruckDuplicateLicensePlate;
 
-import jakarta.servlet.http.HttpServletRequest;
 
 import com.example.ShippingMicroservice.exception.NotFoundException;
 import org.springframework.http.HttpStatus;

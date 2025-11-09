@@ -43,8 +43,7 @@ public class ShippingRequest {
   @Column(name = "real_time")
   private String realTime;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "request_status_id")
+  @Column(name = "request_status_id", nullable = false)
   private ShippingRequestStatus status;
 
   @ManyToOne(fetch = FetchType.LAZY)

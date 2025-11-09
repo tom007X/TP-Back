@@ -19,7 +19,7 @@ public class AddressService {
     private final AddressRepository repository;
 
     public AddressResponseDTO create(AddressRequestDTO dto) {
-        Address address = toEntity(dto);
+        Address address = AddressRequestDTO.toEntity(dto);
         Address returned = repository.save(address);
         return AddressResponseDTO.fromEntity(returned);
     }
@@ -60,14 +60,4 @@ public class AddressService {
         return repository.findById(id).orElseThrow(() -> new NotFoundException(Address.class.getSimpleName(), id));
     }
 
-    private Address toEntity(AddressRequestDTO dto) {
-        return Address.builder()
-                .city(dto.getCity())
-                .postalCode(dto.getPostalCode())
-                .street(dto.getStreet())
-                .number(dto.getNumber())
-                .latitude(dto.getLatitude())
-                .longitude(dto.getLongitude())
-                .build();
-    }
 }
