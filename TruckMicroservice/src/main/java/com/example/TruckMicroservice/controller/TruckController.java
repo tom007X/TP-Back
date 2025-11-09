@@ -4,12 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.TruckMicroservice.model.Truck;
 import com.example.TruckMicroservice.service.TruckService;
@@ -46,5 +41,18 @@ public class TruckController {
     public ResponseEntity<?> createTruck(@Valid @RequestBody Truck truck) {
         Truck truckCreate = serviceTruck.save(truck);
         return ResponseEntity.status(HttpStatus.CREATED).body(truckCreate);
+    }
+
+    @PatchMapping("/{id}/availability")
+    public ResponseEntity<Truck> updateAvailibility(@PathVariable Long id,
+                                                    @RequestParam boolean available){
+        Truck truckUpdate = serviceTruck.updateAvailability(id,available);
+        return ResponseEntity.ok(truckUpdate);
+
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTruck(@PathVariable Long id){
+        serviceTruck.deleteTruckById(id);
+        return ResponseEntity.noContent().build();
     }
 }

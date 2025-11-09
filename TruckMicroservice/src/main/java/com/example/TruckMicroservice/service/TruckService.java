@@ -6,6 +6,7 @@ import com.example.TruckMicroservice.service.interfaces.BasicService;
 
 import java.util.List;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 
@@ -34,4 +35,21 @@ public class TruckService implements BasicService<Truck, Long>{
     public void remove(Truck entity) {
         repositoryImp.delete(entity);
     }
+
+    public void deleteTruckById(Long id) {
+        if (!repositoryImp.existsById(id)) {
+            throw new EntityNotFoundException("Truck not found with id " + id);
+        }
+        repositoryImp.deleteById(id);
+    }
+
+    public Truck updateAvailability(Long id, boolean available) {
+        Truck truck = repositoryImp.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Truck not found with id " + id));
+
+        truck.setAvailable(available);
+        return repositoryImp.save(truck);
+    }
+
+
 }
