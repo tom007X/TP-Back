@@ -7,11 +7,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum ShippingRequestStatus {
-  ESTIMADO(1, "estimado"),
-  ASIGNADO(2, "asignado"),
-  INICIADO(3, "iniciado"),
-  FINALIZADO(4, "finalizado"),
-  CANCELADO(5, "cancelado");
+  PENDIENTE(1, "Pendiente"),
+  INICIADO(2, "Iniciado"),
+  FINALIZADO(3, "Finalizado"),
+  CANCELADO(4, "Cancelado");
 
   private static final Map<Integer, ShippingRequestStatus> BY_CODE = new HashMap<>();
   private static final Map<String, ShippingRequestStatus> BY_VALUE = new HashMap<>();

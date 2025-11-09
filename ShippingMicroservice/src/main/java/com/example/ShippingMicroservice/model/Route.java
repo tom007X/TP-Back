@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,8 +43,8 @@ public class Route {
   @Column(name = "total_distance_km")
   private Double totalDistance;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "request_id")
+  @OneToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
+  @JoinColumn(name = "shipping_request_id", nullable = false, unique = true)
   private ShippingRequest request;
 
   @ManyToOne(fetch = FetchType.LAZY)

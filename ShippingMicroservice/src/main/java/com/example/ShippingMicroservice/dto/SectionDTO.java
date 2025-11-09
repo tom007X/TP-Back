@@ -30,8 +30,8 @@ public class SectionDTO {
             .assignatedTruck(s.getTruckId() != null ? s.getTruckId().toString() : null)
             .start(s.getStartLocation())
             .end(s.getEndLocation())
-            .status(s.getStatus().name())
-            .type(s.getType().name())
+            .status(s.getStatus().getValue())
+            .type(s.getType().getValue())
             .build();
     }
 }

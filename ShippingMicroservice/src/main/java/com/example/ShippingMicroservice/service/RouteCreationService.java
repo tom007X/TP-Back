@@ -53,13 +53,11 @@ public class RouteCreationService {
         route.setNumSections(optimizedRoute.getSelectedDeposits().size() + 1);
         route.setTotalDistance(totalDistance);
 
-        Route savedRoute = routeRepository.save(route);
-
-        createSectionsWithDistances(savedRoute, startAddress, endAddress,
+        createSectionsWithDistances(route, startAddress, endAddress,
                 optimizedRoute.getSelectedDeposits(),
                 optimizedRoute.getSectionDistances());
 
-        return savedRoute;
+        return route;
     }
 
     private void createSectionsWithDistances(Route route, Address start, Address end,
@@ -73,13 +71,12 @@ public class RouteCreationService {
             directSection.setRoute(route);
             directSection.setStartAddress(start);
             directSection.setEndAddress(end);
-            directSection.setStatus(SectionStatus.ASIGNADO);
+            directSection.setStatus(SectionStatus.ESTIMADO);
             directSection.setType(SectionType.ORIGEN_DESTINO);
             if (distanceIndex < distances.size())
                 directSection.setDistance(distances.get(distanceIndex));
             sections.add(directSection);
-            List<Section> savedSections = sectionRepository.saveAll(sections);
-            savedSections.stream().forEach(s -> route.addSection(s));
+            sections.stream().forEach(s -> route.addSection(s));
             return;
         }
         Deposit currentDeposit = deposits.get(0);
@@ -93,7 +90,7 @@ public class RouteCreationService {
             section.setStartAddress(currentStart);
             section.setEndAddress(deposit.getAddress());
             section.setDepositAtEnd(deposit);
-            section.setStatus(SectionStatus.ASIGNADO);
+            section.setStatus(SectionStatus.ESTIMADO);
             if (distanceIndex < distances.size())
                 section.setDistance(distances.get(distanceIndex));
             if (i == 0)
@@ -112,15 +109,13 @@ public class RouteCreationService {
         finalSection.setRoute(route);
         finalSection.setStartAddress(currentStart);
         finalSection.setEndAddress(end);
-        finalSection.setStatus(SectionStatus.ASIGNADO);
+        finalSection.setStatus(SectionStatus.ESTIMADO);
         finalSection.setType(SectionType.DEPOSITO_DESTINO);
         if (distanceIndex < distances.size()) {
             finalSection.setDistance(distances.get(distanceIndex));
         }
         sections.add(finalSection);
-
-        List<Section> savedSections = sectionRepository.saveAll(sections);
-        savedSections.stream().forEach(s -> route.addSection(s));
+        sections.stream().forEach(s -> route.addSection(s));
     }
 
     private List<Deposit> filterIntermediateDeposits(List<Deposit> deposits,

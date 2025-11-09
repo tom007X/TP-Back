@@ -20,7 +20,7 @@ public class ShippingRequestResponseDTO {
     private BigDecimal finalCost;
     private String realTime;
     private ShippingRequestStatus status;
-    private Long containerId;
+    private String containerCode;
     private Long clientId;
     private RouteDTO route;
 
@@ -42,7 +42,7 @@ public class ShippingRequestResponseDTO {
                 .finalCost(request.getFinalCost())
                 .realTime(request.getRealTime())
                 .status(request.getStatus())
-                .containerId(request.getContainer() != null ? request.getContainer().getId() : null)
+                .containerCode(request.getContainer() != null ? request.getContainer().getCode() : null)
                 .clientId(request.getClientId())
                 .build();
     }

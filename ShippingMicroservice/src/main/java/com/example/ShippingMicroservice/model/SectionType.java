@@ -7,10 +7,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum SectionType {
-  ORIGEN_DEPOSITO(1, "origen-deposito"),
-  DEPOSITO_DEPOSITO(2, "deposito-deposito"),
-  DEPOSITO_DESTINO(3, "deposito-destino"),
-  ORIGEN_DESTINO(4, "origen-destino");
+  ORIGEN_DEPOSITO(1, "Origen-Deposito"),
+  DEPOSITO_DEPOSITO(2, "Deposito-Deposito"),
+  DEPOSITO_DESTINO(3, "Deposito-Destino"),
+  ORIGEN_DESTINO(4, "Origen-Destino");
 
   private static final Map<Integer, SectionType> BY_CODE = new HashMap<>();
   private static final Map<String, SectionType> BY_VALUE = new HashMap<>();

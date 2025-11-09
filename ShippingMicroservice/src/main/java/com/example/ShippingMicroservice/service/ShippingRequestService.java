@@ -20,6 +20,8 @@ import com.example.ShippingMicroservice.model.ShippingRequest;
 import com.example.ShippingMicroservice.model.ShippingRequestStatus;
 import com.example.ShippingMicroservice.repository.AddressRepository;
 import com.example.ShippingMicroservice.repository.ContainerRepository;
+import com.example.ShippingMicroservice.repository.RouteRepository;
+import com.example.ShippingMicroservice.repository.SectionRepository;
 import com.example.ShippingMicroservice.repository.ShippingRequestRepository;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +34,8 @@ public class ShippingRequestService {
     private final ShippingRequestRepository shippingRequestRepository;
     private final ContainerRepository containerRepository;
     private final AddressRepository addressRepository;
+    private final RouteRepository routeRepository;
+    private final SectionRepository sectionRepository;
     private final RouteCreationService routeCreationService;
     private final CostCalculationService costCalculationService;
 
@@ -57,15 +61,21 @@ public class ShippingRequestService {
         shippingRequest.setRequestDatetime(LocalDateTime.now());
         shippingRequest.setEstimatedCost(estimatedCost);
         shippingRequest.setEstimatedTime(estimatedTime);
-        shippingRequest.setStatus(ShippingRequestStatus.ESTIMADO);
+        shippingRequest.setStatus(ShippingRequestStatus.PENDIENTE);
         shippingRequest.setContainer(container);
         shippingRequest.setClientId(dto.getClientId());
 
         ShippingRequest saved = shippingRequestRepository.save(shippingRequest);
+        route.setRequest(saved);
+        Route savedRoute = routeRepository.save(route);
+        savedRoute.getSections().forEach(section -> {
+            section.setRoute(savedRoute);
+            sectionRepository.save(section);
+        });
 
-        return ShippingRequestResponseDTO.fromEntity(saved, route);
+
+        return ShippingRequestResponseDTO.fromEntity(saved, savedRoute);
     }
-
 
     @Transactional(readOnly = true)
     public ShippingRequestResponseDTO getShippingRequest(Long id, Long clientId) {
@@ -79,14 +89,13 @@ public class ShippingRequestService {
         return ShippingRequestResponseDTO.fromEntity(request);
     }
 
-
     @Transactional(readOnly = true)
     public List<ShippingRequestResponseDTO> getShippingRequestsByClient(Long clientId) {
         List<ShippingRequest> requests = shippingRequestRepository
                 .findByClientIdOrderByRequestDatetimeDesc(clientId);
 
         return requests.stream()
-                .map(request -> ShippingRequestResponseDTO.fromEntity(request))
+                .map(request -> ShippingRequestResponseDTO.fromEntity(request, request.getRoute()))
                 .collect(Collectors.toList());
     }
 
@@ -98,7 +107,6 @@ public class ShippingRequestService {
         if (!request.getClientId().equals(clientId)) {
             throw new SecurityException("Access denied to this shipping request");
         }
-
 
         if (request.getStatus() == ShippingRequestStatus.FINALIZADO ||
                 request.getStatus() == ShippingRequestStatus.CANCELADO) {

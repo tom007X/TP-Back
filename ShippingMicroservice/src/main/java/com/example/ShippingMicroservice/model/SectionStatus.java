@@ -7,10 +7,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum SectionStatus {
-  ESTIMADO(1, "estimado"),
-  ASIGNADO(2, "asignado"),
-  INICIADO(3, "iniciado"),
-  FINALIZADO(4, "finalizado");
+  ESTIMADO(1, "Estimado"),
+  ASIGNADO(2, "Asignado"),
+  INICIADO(3, "Iniciado"),
+  FINALIZADO(4, "Finalizado"),
+  CANCELADO(5, "Cancelado");
 
   private static final Map<Integer, SectionStatus> BY_CODE = new HashMap<>();
   private static final Map<String, SectionStatus> BY_VALUE = new HashMap<>();
