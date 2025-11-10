@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.ShippingMicroservice.dto.AsignTruckDTO;
 import com.example.ShippingMicroservice.dto.CreateShippingRequestDTO;
 import com.example.ShippingMicroservice.dto.ShippingRequestResponseDTO;
 import com.example.ShippingMicroservice.service.ShippingRequestService;
@@ -61,6 +62,12 @@ public class ShippingController {
 
         ShippingRequestResponseDTO response = shippingRequestService.cancelShippingRequest(id, clientId);
         return ResponseEntity.ok(response);
+    }
 
+    @PutMapping("/{requestId}/sections/{sectionId}/asign-truck")
+    public ResponseEntity<?> asignTruckToSection(@PathVariable Long requestId, @PathVariable Long sectionId,
+            @Valid @RequestBody AsignTruckDTO dto) {
+        ShippingRequestResponseDTO response = shippingRequestService.asignTruckToSection(requestId, sectionId, dto);
+        return ResponseEntity.ok().body(response);
     }
 }

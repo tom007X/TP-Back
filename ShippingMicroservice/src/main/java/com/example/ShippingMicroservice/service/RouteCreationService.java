@@ -12,8 +12,6 @@ import com.example.ShippingMicroservice.model.Section;
 import com.example.ShippingMicroservice.model.SectionStatus;
 import com.example.ShippingMicroservice.model.SectionType;
 import com.example.ShippingMicroservice.repository.DepositRepository;
-import com.example.ShippingMicroservice.repository.RouteRepository;
-import com.example.ShippingMicroservice.repository.SectionRepository;
 import com.example.ShippingMicroservice.service.interfaces.DirectionsService;
 
 import jakarta.transaction.Transactional;
@@ -23,8 +21,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RouteCreationService {
 
-    private final RouteRepository routeRepository;
-    private final SectionRepository sectionRepository;
     private final DepositRepository depositRepository;
     private final DirectionsService directionsService;
 

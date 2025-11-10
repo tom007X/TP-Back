@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.example.ShippingMicroservice.dto.AddressRequestDTO;
+import com.example.ShippingMicroservice.dto.AsignTruckDTO;
 import com.example.ShippingMicroservice.dto.CreateShippingRequestDTO;
 import com.example.ShippingMicroservice.dto.ShippingRequestResponseDTO;
 import com.example.ShippingMicroservice.exception.BadRequestException;
@@ -16,6 +17,7 @@ import com.example.ShippingMicroservice.model.Address;
 import com.example.ShippingMicroservice.model.Container;
 import com.example.ShippingMicroservice.model.ContainerStatus;
 import com.example.ShippingMicroservice.model.Route;
+import com.example.ShippingMicroservice.model.SectionStatus;
 import com.example.ShippingMicroservice.model.ShippingRequest;
 import com.example.ShippingMicroservice.model.ShippingRequestStatus;
 import com.example.ShippingMicroservice.repository.AddressRepository;
@@ -25,6 +27,7 @@ import com.example.ShippingMicroservice.repository.SectionRepository;
 import com.example.ShippingMicroservice.repository.ShippingRequestRepository;
 
 import org.springframework.transaction.annotation.Transactional;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -54,7 +57,7 @@ public class ShippingRequestService {
 
         Route route = routeCreationService.createRouteWithDeposits(startAddress, endAddress);
 
-        BigDecimal estimatedCost = costCalculationService.calculateCost(route, container);
+        BigDecimal estimatedCost = costCalculationService.estimateCost(route);
         String estimatedTime = costCalculationService.calculateEstimatedTime(route);
 
         ShippingRequest shippingRequest = new ShippingRequest();
@@ -72,9 +75,9 @@ public class ShippingRequestService {
             section.setRoute(savedRoute);
             sectionRepository.save(section);
         });
+        saved.setRoute(savedRoute);
 
-
-        return ShippingRequestResponseDTO.fromEntity(saved, savedRoute);
+        return ShippingRequestResponseDTO.fromEntity(saved);
     }
 
     @Transactional(readOnly = true)
@@ -95,7 +98,7 @@ public class ShippingRequestService {
                 .findByClientIdOrderByRequestDatetimeDesc(clientId);
 
         return requests.stream()
-                .map(request -> ShippingRequestResponseDTO.fromEntity(request, request.getRoute()))
+                .map(request -> ShippingRequestResponseDTO.fromEntity(request))
                 .collect(Collectors.toList());
     }
 
@@ -118,6 +121,38 @@ public class ShippingRequestService {
         ShippingRequest updated = shippingRequestRepository.save(request);
 
         return ShippingRequestResponseDTO.fromEntity(updated);
+    }
+
+    @Transactional
+    public ShippingRequestResponseDTO asignTruckToSection(Long requestId, Long sectionId, AsignTruckDTO dto) {
+        ShippingRequest request = shippingRequestRepository.findById(requestId)
+                .orElseThrow(() -> new NotFoundException("ShippingRequest", requestId));
+
+        Route route = request.getRoute();
+        if (route == null) {
+            throw new NotFoundException("Route for ShippingRequest", requestId);
+        }
+
+        var sectionOpt = route.getSections().stream()
+                .filter(s -> s.getId().equals(sectionId))
+                .findFirst();
+
+        if (sectionOpt.isEmpty()) {
+            throw new NotFoundException("Section", sectionId);
+        }
+
+        var section = sectionOpt.get();
+        section.setTruckId(dto.getTruckId());
+        section.setRealCost(BigDecimal.valueOf(dto.getTruckCostPerKm())
+                .multiply(BigDecimal.valueOf(section.getDistance())));
+        section.setStatus(SectionStatus.ASIGNADO);
+
+        BigDecimal estimatedCost = costCalculationService.estimateCost(route);
+        request.setEstimatedCost(estimatedCost);
+
+        ShippingRequest returned = shippingRequestRepository.save(request);
+
+        return ShippingRequestResponseDTO.fromEntity(returned);
     }
 
     private Address createOrFindAddress(AddressRequestDTO dto) {

@@ -38,9 +38,6 @@ public class Section {
   @Column(name = "datetime_end")
   private LocalDateTime datetimeEnd;
 
-  @Column(name = "estimate_cost")
-  private BigDecimal estimateCost;
-
   @Column(name = "real_cost")
   private BigDecimal realCost;
 
