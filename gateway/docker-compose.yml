@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  gateway-service:
+    build: .
+    container_name: gateway-container
+    ports:
+      - "8093:8093"
+    environment:
+      - SERVER_PORT=8093
+      - SPRING_WEBFLUX_BASE_PATH=/api/v1
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/tpi-backend
+      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER_URI=http://keycloak:8080/realms/tpi-backend
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.3
+    container_name: keycloak
+    command: start-dev
+    ports:
+      - "8081:8080"
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin123
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+
+volumes:
+  keycloak_data:
