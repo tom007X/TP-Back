@@ -2,6 +2,8 @@ package com.example.TruckMicroservice.controller;
 
 import java.util.List;
 
+import com.example.TruckMicroservice.dto.TruckRequestDTO;
+import com.example.TruckMicroservice.dto.TruckResponseDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +21,8 @@ public class TruckController {
     private final TruckService serviceTruck;
         
     @GetMapping("/{id}")
-    public ResponseEntity<Truck> getTruckById(@PathVariable Long id) {
-        Truck truck = serviceTruck.findById(id);
+    public ResponseEntity<TruckResponseDTO> getTruckById(@PathVariable Long id) {
+        TruckResponseDTO truck = serviceTruck.findById(id);
         if(truck == null) {
             return ResponseEntity.notFound().build();
         }
@@ -28,8 +30,8 @@ public class TruckController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Truck>> getAllTruck() {
-        List<Truck> trucks = serviceTruck.findAll();
+    public ResponseEntity<List<TruckResponseDTO>> getAllTruck() {
+        List<TruckResponseDTO> trucks = serviceTruck.findAll();
 
         if(trucks.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -38,15 +40,15 @@ public class TruckController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createTruck(@Valid @RequestBody Truck truck) {
-        Truck truckCreate = serviceTruck.save(truck);
+    public ResponseEntity<TruckResponseDTO> createTruck(@Valid @RequestBody TruckRequestDTO truck) {
+        TruckResponseDTO truckCreate = serviceTruck.create(truck);
         return ResponseEntity.status(HttpStatus.CREATED).body(truckCreate);
     }
 
     @PatchMapping("/{id}/availability")
-    public ResponseEntity<Truck> updateAvailibility(@PathVariable Long id,
+    public ResponseEntity<TruckResponseDTO> updateAvailibility(@PathVariable Long id,
                                                     @RequestParam boolean available){
-        Truck truckUpdate = serviceTruck.updateAvailability(id,available);
+        TruckResponseDTO truckUpdate = serviceTruck.updateAvailability(id,available);
         return ResponseEntity.ok(truckUpdate);
 
     }

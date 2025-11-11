@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-@Getter @Setter @AllArgsConstructor @NoArgsConstructor
+@Getter @Setter @AllArgsConstructor @NoArgsConstructor @Builder
 @Entity
 @Table(name = "TRUCK")
 public class Truck {
@@ -40,7 +40,7 @@ public class Truck {
     @Column(name = "is_available")
     private boolean isAvailable;
 
-    @ManyToOne()
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "driver_id")
     private Driver driver;
 
