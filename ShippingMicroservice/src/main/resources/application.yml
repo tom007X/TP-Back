@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: Shipping-Microservice
+
+  datasource:
+    url: jdbc:mysql://localhost:3315/mi_basedatos_app?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: user_1
+    password: mi_usUario22
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    defer-datasource-initialization: true
+
+  sql:
+    init:
+      mode: always
+
+google:
+  maps:
+    api-key: YOUR_API_KEY_HERE
+    directions-url: https://maps.googleapis.com/maps/api/directions/json
+server:
+  port: 8090

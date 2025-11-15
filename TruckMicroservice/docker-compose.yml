@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  mysql-db:
+    image: mysql:8.0.33
+    container_name: truck-container
+    environment:
+      # La contraseña del usuario root
+      MYSQL_ROOT_PASSWORD: root_1
+      # El nombre de la base de datos que se creará al inicio
+      MYSQL_DATABASE: mi_basedatos_app
+      # El nombre del usuario que tendrá permisos en esa base de datos (opcional, pero buena práctica)
+      MYSQL_USER: user_1
+      # La contraseña del usuario anterior
+      MYSQL_PASSWORD: mi_usUario22
+    ports:
+      - "3310:3306"
+    volumes:
+      # Persiste los datos en tu máquina local para que no se pierdan al detener el contenedor
+      - mysql_data:/var/lib/mysql
+
+    restart: unless-stopped
+
+# Volúmenes para persistir los datos
+volumes:
+  mysql_data:
