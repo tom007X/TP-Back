@@ -3,9 +3,9 @@ spring:
     name: TruckMicroservice
 
   datasource:
-    url: jdbc:mysql://localhost:3310/mi_basedatos_app?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-    username: user_1
-    password: mi_usUario22
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3310}/${DB_NAME:mi_basedatos_app}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: ${DB_USER:user_1}
+    password: ${DB_PASSWORD:mi_usUario22}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -17,9 +17,9 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
     defer-datasource-initialization: true
 
-  #sql:
-   # init:
-    #  mode: always
+  sql:
+    init:
+      mode: always
 
 server:
   port: 8091

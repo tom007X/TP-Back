@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.TruckMicroservice.model.Truck;
 import com.example.TruckMicroservice.service.TruckService;
 
 import jakarta.validation.Valid;
@@ -43,6 +42,13 @@ public class TruckController {
     public ResponseEntity<TruckResponseDTO> createTruck(@Valid @RequestBody TruckRequestDTO truck) {
         TruckResponseDTO truckCreate = serviceTruck.create(truck);
         return ResponseEntity.status(HttpStatus.CREATED).body(truckCreate);
+    }
+
+    @PatchMapping("/{id}/assign/{idDriver}")
+    public ResponseEntity<TruckResponseDTO> assignDriver(@PathVariable("id") Long idTruck,
+                                                         @PathVariable("idDriver") Long idDriver){
+        TruckResponseDTO truckResponse = serviceTruck.assignDriver(idTruck, idDriver);
+        return ResponseEntity.ok(truckResponse);
     }
 
     @PatchMapping("/{id}/availability")
