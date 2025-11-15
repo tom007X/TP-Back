@@ -1,5 +1,7 @@
 package com.container.client_api.controllers;
 
+import com.container.client_api.dto.ClientRequestDTO;
+import com.container.client_api.dto.ClientResponseDTO;
 import com.container.client_api.models.Client;
 import com.container.client_api.service.ClientService;
 import jakarta.validation.Valid;
@@ -18,27 +20,25 @@ public class ClientController {
     private final ClientService clientService;
 
     @GetMapping()
-    public ResponseEntity<List<Client>> getAllClient(){
-        List<Client> client = clientService.getAll();
-        if (client.isEmpty()){
+    public ResponseEntity<List<ClientResponseDTO>> getAllClients() {
+        List<ClientResponseDTO> clients = clientService.getAllClients();
+
+        if (clients.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(client);
+
+        return ResponseEntity.ok(clients);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Client> getClientById(@PathVariable Long id){
-        Client client = clientService.getById(id);
-        if (client == null){
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<ClientResponseDTO> getClientById(@PathVariable Long id) {
+        ClientResponseDTO client = clientService.findClientById(id);
         return ResponseEntity.ok(client);
     }
 
-    @PostMapping()
-    public ResponseEntity<Client> createClient(@Valid @RequestBody Client client){
-        Client clientCreated = clientService.save(client);
-        return ResponseEntity.status(HttpStatus.CREATED).body(clientCreated);
+    @PostMapping
+    public ResponseEntity<ClientResponseDTO> createClient(@Valid @RequestBody ClientRequestDTO clientRequestDTO) {
+        ClientResponseDTO createdClient = clientService.createClientDTO(clientRequestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdClient);
     }
-
 }

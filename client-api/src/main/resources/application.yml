@@ -2,20 +2,24 @@ spring:
   application:
     name: client-api
 
+
   datasource:
-    url: jdbc:mysql://localhost:3320/mi_basedatos_app?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-    username: user_1
-    password: mi_usUario22
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3320}/${DB_NAME:mi_basedatos_app}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: ${DB_USER:user_1}
+    password: ${DB_PASSWORD:mi_usUario22}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update   # o 'create', 'none', según lo que necesites
+      ddl-auto: create-drop   # o 'create', 'none', según lo que necesites
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
     show-sql: true
-
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
 server:
-  port: 8091
+  port: 8092
 
