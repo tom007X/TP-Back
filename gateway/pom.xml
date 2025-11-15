@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -21,10 +22,18 @@
   </properties>
 
   <dependencies>
-    <!-- Gateway reactivo -->
+    <!-- Gateway basado en Servlet (Spring MVC, NO WebFlux) -->
     <dependency>
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-starter-gateway</artifactId>
+    </dependency>
+
+    <!-- API Servlet de Jakarta (jakarta.servlet.*) -->
+    <!-- El scope provided evita duplicar lo que ya trae el contenedor embebido -->
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <!-- Seguridad + OAuth2 (cliente para login con Keycloak) -->
@@ -32,16 +41,18 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-security</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-oauth2-client</artifactId>
     </dependency>
 
-    <!-- Si también vas a validar JWT en el gateway (recursos protegidos) -->
+    <!-- Validación de JWT como resource server -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
     </dependency>
+
     <!-- Necesario para decodificar/validar JWT (Nimbus JOSE) -->
     <dependency>
       <groupId>org.springframework.security</groupId>
@@ -55,11 +66,13 @@
       <scope>runtime</scope>
       <optional>true</optional>
     </dependency>
+
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <optional>true</optional>
     </dependency>
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
@@ -67,7 +80,7 @@
     </dependency>
   </dependencies>
 
-  <!-- SOLO el BOM de Spring Cloud va en dependencyManagement -->
+  <!-- BOM de Spring Cloud -->
   <dependencyManagement>
     <dependencies>
       <dependency>

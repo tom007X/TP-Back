@@ -6,12 +6,6 @@ spring:
   application:
     name: gateway
 
-  main:
-    web-application-type: reactive   # explícito para WebFlux
-
-  webflux:
-    base-path: /api/v1               # << CORRECTO (antes estaba vacío/mal ubicado)
-
   security:
     oauth2:
       client:

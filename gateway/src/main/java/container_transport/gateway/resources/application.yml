@@ -1,4 +1,0 @@
-"# Deprecated: this file was accidentally placed under src/main/java and can cause the wrong configuration to be
-# included in the classpath. The real configuration now lives at src/main/resources/application.yml.
-"# Please delete this file from the java sources; left intentionally empty to avoid being used.
-
