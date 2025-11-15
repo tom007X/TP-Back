@@ -22,8 +22,15 @@ public class Tariff {
   @Column(name = "tariff_id")
   private Long id;
 
-  private String description;
+  @Column(name = "subject")
+  private String subject;
+
+  @Column(name = "metric")
+  private String metric;
 
   @Column(name = "value")
   private BigDecimal value;
+
+  @Column(name = "available")
+  private Boolean available;
 }

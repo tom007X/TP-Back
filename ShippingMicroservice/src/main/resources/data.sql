@@ -1,32 +1,3 @@
-/*
--- Section Type LUT
-INSERT INTO section_type_lut (code, name) VALUES (1, 'origen-deposito')
-ON DUPLICATE KEY UPDATE name = VALUES(name);
-
-INSERT INTO section_type_lut (code, name) VALUES (2, 'deposito-deposito')
-ON DUPLICATE KEY UPDATE name = VALUES(name);
-
-INSERT INTO section_type_lut (code, name) VALUES (3, 'deposito-destino')
-ON DUPLICATE KEY UPDATE name = VALUES(name);
-
-INSERT INTO section_type_lut (code, name) VALUES (4, 'origen-destino')
-ON DUPLICATE KEY UPDATE name = VALUES(name);
-
--- Section Status LUT
-INSERT INTO section_status_lut (code, name) VALUES (1, 'estimado')
-ON DUPLICATE KEY UPDATE name = VALUES(name);
-
-INSERT INTO section_status_lut (code, name) VALUES (2, 'asignado')
-ON DUPLICATE KEY UPDATE name = VALUES(name);
-
-INSERT INTO section_status_lut (code, name) VALUES (3, 'iniciado')
-ON DUPLICATE KEY UPDATE name = VALUES(name);
-
-INSERT INTO section_status_lut (code, name) VALUES (4, 'finalizado')
-ON DUPLICATE KEY UPDATE name = VALUES(name);
-*/
-
-
 SET FOREIGN_KEY_CHECKS = 1;
 
 
@@ -116,3 +87,8 @@ INSERT INTO container (code, weight, volume, container_state_id, client_id) VALU
 ('CONT003', 3000, 15.0, 3, 3),
 ('CONT004', 2500, 13.0, 1, 4),
 ('CONT005', 1800, 11.0, 2, 5);
+
+INSERT INTO tariff (subject, metric, value, available) VALUES
+('Truck',   'distance', 250, 1),
+('Deposit', 'day',       50, 1),
+('Base',    '_',        100, 1);
