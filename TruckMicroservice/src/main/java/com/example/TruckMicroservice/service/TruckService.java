@@ -1,5 +1,4 @@
 package com.example.TruckMicroservice.service;
-import com.example.TruckMicroservice.dto.DriverResponseDTO;
 import com.example.TruckMicroservice.dto.TruckRequestDTO;
 import com.example.TruckMicroservice.dto.TruckResponseDTO;
 import com.example.TruckMicroservice.exception.NotFoundException;
@@ -24,13 +23,13 @@ public class TruckService {
     private final DriverService driverService;
 
     @Transactional
-    public TruckResponseDTO create(TruckRequestDTO truckRequestDTO) {
-
-        boolean exists = repositoryImp.existsByLicensePlate(truckRequestDTO.getLicensePlate());
+    public TruckResponseDTO create(TruckRequestDTO entity) {
+        entity.setLicensePlate(entity.getLicensePlate().toUpperCase().trim());
+        boolean exists = repositoryImp.existsByLicensePlate(entity.getLicensePlate());
         if (exists)
-            throw new TruckDuplicateLicensePlate(truckRequestDTO.getLicensePlate());
+            throw new TruckDuplicateLicensePlate(entity.getLicensePlate());
 
-        Truck newTruck = truckRequestDTO.toEntity();
+        Truck newTruck = entity.toEntity();
 
         if(newTruck.getDriver() != null ) {
             if(newTruck.getDriver().getId() != null) {
@@ -38,7 +37,8 @@ public class TruckService {
                     Driver driver = driverService.findDriverEntityById(newTruck.getDriver().getId());
                     newTruck.setDriver(driver);
                 }else {
-                    newTruck.setDriver(null);
+                     Driver newDriver = driverService.create(entity.getDriver()).toEntity();
+                    newTruck.setDriver(newDriver);
                 }
             }
         }

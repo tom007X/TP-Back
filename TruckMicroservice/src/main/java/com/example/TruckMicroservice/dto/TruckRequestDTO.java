@@ -3,6 +3,7 @@ package com.example.TruckMicroservice.dto;
 import com.example.TruckMicroservice.model.Driver;
 import com.example.TruckMicroservice.model.Truck;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
@@ -34,6 +35,13 @@ public class TruckRequestDTO {
 
     private Long driverId;
 
+    private DriverRequestDTO driver;
+
+    @AssertTrue(message = "Provide either driverId or driver, not both.")
+    public boolean isDriverReferenceExclusive() {
+        return driverId == null || driver == null;
+    }
+
     public Truck toEntity() {
         Truck truck = new Truck();
         truck.setLicensePlate(this.licensePlate);
@@ -44,10 +52,12 @@ public class TruckRequestDTO {
         truck.setAvailable(this.isAvailable);
 
         // 👇 Asociamos solo el id del Driver si está presente
-        if (this.driverId != null) {
-            Driver driver = new Driver();
-            driver.setId(this.driverId);
-            truck.setDriver(driver);
+         if (this.driverId != null) {
+            Driver d = new Driver();
+            d.setId(this.driverId);
+            truck.setDriver(d);
+        } else if (this.driver != null) {
+            truck.setDriver(this.driver.toEntity());
         }
 
         return truck;

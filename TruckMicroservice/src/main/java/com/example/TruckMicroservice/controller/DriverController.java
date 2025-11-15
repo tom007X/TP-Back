@@ -41,7 +41,7 @@ public class DriverController {
 
     @PostMapping
     public ResponseEntity<DriverResponseDTO> createDriver(@Valid @RequestBody DriverRequestDTO driverDTO) {
-        DriverResponseDTO driverResponse = serviceDriver.createDriverDTO(driverDTO);
+        DriverResponseDTO driverResponse = serviceDriver.create(driverDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(driverResponse);
     }
     @DeleteMapping("/{id}")

@@ -22,4 +22,13 @@ public class DriverResponseDTO {
                 .build();
     }
 
+    public Driver toEntity(){
+        Driver driver = new Driver();
+        driver.setId(this.id);
+        driver.setName(this.name);
+        driver.setSurname(this.surname);
+        driver.setPhone(this.phone);
+        return driver;
+    }
+
 }

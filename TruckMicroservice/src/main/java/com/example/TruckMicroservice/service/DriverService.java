@@ -21,7 +21,7 @@ public class DriverService{
     private final DriverRepositoryImp repositoryImp;
 
     @Transactional
-    public DriverResponseDTO createDriverDTO(DriverRequestDTO driverRequestDTO) {
+    public DriverResponseDTO create(DriverRequestDTO driverRequestDTO) {
 
         Driver newDriver = Driver.builder()
                 .name(driverRequestDTO.getName())
