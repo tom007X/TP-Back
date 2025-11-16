@@ -23,15 +23,14 @@ public class GWConfig {
             @Value("${routing.microservice.trucks}") String uriTrucks,
             @Value("${routing.microservice.clients}") String uriClients,
             @Value("${routing.microservice.shipping}") String uriShipping) {
-                System.out.println(">>> uriTrucks = " + uriTrucks);
-                System.out.println(">>> uriClients = " + uriClients);
-                System.out.println(">>> uriShipping = " + uriShipping);
         return builder.routes()
                 .route(p -> p.path("/api/v1/trucks/**").uri(uriTrucks))
                 .route(p -> p.path("/api/v1/drivers/**").uri(uriTrucks))
                 .route(p -> p.path("/api/v1/clients/**").uri(uriClients))
                 .route(p -> p.path("/api/v1/addresses/**").uri(uriShipping))
+                .route(p -> p.path("/api/v1/containers/**").uri(uriShipping))
                 .route(p -> p.path("/api/v1/deposits/**").uri(uriShipping))
+                .route(p -> p.path("/api/v1/tariffs/**").uri(uriShipping))
                 .build();
     }
 }

@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.ShippingMicroservice.dto.shipping_request.AsignTruckDTO;
 import com.example.ShippingMicroservice.dto.shipping_request.CreateShippingRequestDTO;
 import com.example.ShippingMicroservice.dto.shipping_request.ShippingRequestResponseDTO;
-import com.example.ShippingMicroservice.service.ContainerService;
 import com.example.ShippingMicroservice.service.ShippingRequestService;
 
 import jakarta.validation.Valid;

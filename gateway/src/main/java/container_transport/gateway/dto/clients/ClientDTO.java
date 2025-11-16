@@ -1,4 +1,4 @@
-package container_transport.gateway.dto;
+package container_transport.gateway.dto.clients;
 
 import lombok.Data;
 

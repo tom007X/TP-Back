@@ -1,4 +1,4 @@
-package container_transport.gateway.dto;
+package container_transport.gateway.dto.shipping_requests;
 
 import lombok.Data;
 
