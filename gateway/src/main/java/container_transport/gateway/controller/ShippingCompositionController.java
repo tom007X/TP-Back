@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 
-import container_transport.gateway.dto.AsignTruckDTO;
-import container_transport.gateway.dto.ClientDTO;
-import container_transport.gateway.dto.CreateShippingRequestDTO;
-import container_transport.gateway.dto.ShippingRequestResponseDTO;
-import container_transport.gateway.dto.TruckResponseDTO;
+import container_transport.gateway.dto.clients.ClientDTO;
+import container_transport.gateway.dto.shipping_requests.AsignTruckDTO;
+import container_transport.gateway.dto.shipping_requests.CreateShippingRequestDTO;
+import container_transport.gateway.dto.shipping_requests.ShippingRequestResponseDTO;
+import container_transport.gateway.dto.trucks.TruckResponseDTO;
 import jakarta.validation.Valid;
 import reactor.core.publisher.Mono;
 
@@ -48,7 +48,8 @@ public class ShippingCompositionController {
         return validateClientExists(clientId)
                 .then(
                         webClientShipping.get()
-                                .uri("/api/v1/shipping-requests?clientId={clientId}", clientId)
+                                .uri("/api/v1/shipping-requests?clientId={clientId}",
+                                        clientId)
                                 .exchangeToMono(clientResponse -> clientResponse
                                         .bodyToFlux(ShippingRequestResponseDTO.class)
                                         .collectList()
@@ -79,6 +80,22 @@ public class ShippingCompositionController {
                                                         .headers()
                                                         .asHttpHeaders())
                                                 .body(body))));
+    }
+
+    @GetMapping("/container/{containerCode}")
+    public Mono<ResponseEntity<ShippingRequestResponseDTO>> getShippingRequestByContainerCode(
+            @PathVariable String containerCode,
+            @RequestParam Long clientId) {
+
+        return validateClientExists(clientId)
+                .then(
+                        webClientShipping.get()
+                                .uri(uriBuilder -> uriBuilder
+                                        .path("/api/v1/shipping-requests/container/{containerCode}")
+                                        .queryParam("clientId", clientId)
+                                        .build(containerCode))
+                                .retrieve()
+                                .toEntity(ShippingRequestResponseDTO.class));
     }
 
     @PostMapping
@@ -159,6 +176,32 @@ public class ShippingCompositionController {
                                     .retrieve()
                                     .toEntity(ShippingRequestResponseDTO.class));
                 });
+    }
+
+    @PutMapping("/{requestId}/sections/{sectionId}/start")
+    public Mono<ResponseEntity<ShippingRequestResponseDTO>> startSection(
+            @PathVariable Long requestId,
+            @PathVariable Long sectionId) {
+
+        return webClientShipping.put()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/api/v1/shipping-requests/{requestId}/sections/{sectionId}/start")
+                        .build(requestId, sectionId))
+                .retrieve()
+                .toEntity(ShippingRequestResponseDTO.class);
+    }
+
+    @PutMapping("/{requestId}/sections/{sectionId}/finish")
+    public Mono<ResponseEntity<ShippingRequestResponseDTO>> finishSection(
+            @PathVariable Long requestId,
+            @PathVariable Long sectionId) {
+
+        return webClientShipping.put()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/api/v1/shipping-requests/{requestId}/sections/{sectionId}/finish")
+                        .build(requestId, sectionId))
+                .retrieve()
+                .toEntity(ShippingRequestResponseDTO.class);
     }
 
     private Mono<ClientDTO> validateClientExists(Long clientId) {

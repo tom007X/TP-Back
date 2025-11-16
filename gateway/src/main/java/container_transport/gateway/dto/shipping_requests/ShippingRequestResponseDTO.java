@@ -1,4 +1,4 @@
-package container_transport.gateway.dto;
+package container_transport.gateway.dto.shipping_requests;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -19,5 +19,4 @@ public class ShippingRequestResponseDTO {
     private String containerCode;
     private Long clientId;
     private RouteDTO route;
-
 }

@@ -41,29 +41,53 @@ public class SecurityConfig {
             .authorizeExchange(exchanges -> exchanges
                 .pathMatchers("/public/**").permitAll()
 
-                // Shipping requests
-                .pathMatchers(HttpMethod.POST, "/api/v1/shipping-requests").hasRole("CLIENTE")
-                .pathMatchers(HttpMethod.GET, "/api/v1/shipping-requests/**").hasRole("CLIENTE")
-
                 // Addresses
+                .pathMatchers(HttpMethod.DELETE, "/api/v1/addresses/**").hasRole("ADMINISTRADOR")
+                .pathMatchers(HttpMethod.GET, "/api/v1/addresses/**").hasRole("ADMINISTRADOR")
                 .pathMatchers(HttpMethod.POST, "/api/v1/addresses").hasRole("ADMINISTRADOR")
                 .pathMatchers(HttpMethod.PUT, "/api/v1/addresses/**").hasRole("ADMINISTRADOR")
 
+                // Containers
+                .pathMatchers(HttpMethod.DELETE, "/api/v1/containers/**").hasRole("ADMINISTRADOR")
+                .pathMatchers(HttpMethod.GET, "/api/v1/containers/**").hasAnyRole("CLIENTE","ADMINISTRADOR")
+                .pathMatchers(HttpMethod.POST, "/api/v1/containers").hasRole("ADMINISTRADOR")
+                .pathMatchers(HttpMethod.PUT, "/api/v1/containers/**").hasRole("ADMINISTRADOR")
+
                 // Deposits
+                .pathMatchers(HttpMethod.DELETE, "/api/v1/deposits/**").hasRole("ADMINISTRADOR")
+                .pathMatchers(HttpMethod.GET, "/api/v1/deposits/**").hasRole("ADMINISTRADOR")
                 .pathMatchers(HttpMethod.POST, "/api/v1/deposits").hasRole("ADMINISTRADOR")
                 .pathMatchers(HttpMethod.PUT, "/api/v1/deposits/**").hasRole("ADMINISTRADOR")
+
+                // Drivers
+                .pathMatchers(HttpMethod.DELETE, "/api/v1/drivers/**").hasRole("ADMINISTRADOR")
+                .pathMatchers(HttpMethod.GET, "/api/v1/drivers/**").hasRole("ADMINISTRADOR")
+                .pathMatchers(HttpMethod.POST, "/api/v1/drivers").hasRole("ADMINISTRADOR")
+                .pathMatchers(HttpMethod.PUT, "/api/v1/drivers/**").hasRole("ADMINISTRADOR")
+
+                // Shipping requests
+                .pathMatchers(HttpMethod.POST, "/api/v1/shipping-requests").hasRole("CLIENTE")
+                .pathMatchers(HttpMethod.GET, "/api/v1/shipping-requests/**").hasRole("CLIENTE")
+                    // Assign truck to section
+                    .pathMatchers(HttpMethod.PUT, "/api/v1/shipping-requests/{requestId}/sections/{sectionId}/asign-truck")
+                        .hasRole("ADMINISTRADOR")
+                    // Start and finish section
+                    .pathMatchers(HttpMethod.PUT, "/api/v1/shipping-requests/{requestId}/sections/{sectionId}/start")
+                        .hasRole("TRANSPORTISTA")
+                    .pathMatchers(HttpMethod.PUT, "/api/v1/shipping-requests/{requestId}/sections/{sectionId}/finish")
+                        .hasRole("TRANSPORTISTA")
+
+                // Tariffs
+                .pathMatchers(HttpMethod.DELETE, "/api/v1/tariffs/**").hasRole("ADMINISTRADOR")
+                .pathMatchers(HttpMethod.GET, "/api/v1/tariffs/**").hasRole("ADMINISTRADOR")
+                .pathMatchers(HttpMethod.POST, "/api/v1/tariffs").hasRole("ADMINISTRADOR")
+                .pathMatchers(HttpMethod.PUT, "/api/v1/tariffs/**").hasRole("ADMINISTRADOR")
 
                 // Trucks
                 .pathMatchers(HttpMethod.GET, "/api/v1/trucks/**").hasRole("ADMINISTRADOR")
                 .pathMatchers(HttpMethod.POST, "/api/v1/trucks").hasRole("ADMINISTRADOR")
                 .pathMatchers(HttpMethod.PUT, "/api/v1/trucks/**").hasRole("ADMINISTRADOR")
-
-                // Assign truck to section
-                .pathMatchers(HttpMethod.PUT, "/api/v1/shipping-requests/{requestId}/sections/{sectionId}/asign-truck")
-                    .hasRole("ADMINISTRADOR")
-
-                // Register start/end of section
-                .pathMatchers(HttpMethod.PUT, "/api/v1/trucks/{id}/availability").hasRole("TRANSPORTISTA")
+                .pathMatchers(HttpMethod.DELETE, "/api/v1/trucks/**").hasRole("ADMINISTRADOR")
 
                 .anyExchange().authenticated()
             )
