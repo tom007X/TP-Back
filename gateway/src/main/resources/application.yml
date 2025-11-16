@@ -1,6 +1,11 @@
 spring:
   application:
     name: gateway
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8081/realms/tpi-backend
 
 server:
   port: 8093
@@ -10,10 +15,3 @@ routing:
     trucks: http://localhost:8090
     clients: http://localhost:8091
     shipping: http://localhost:8092
-
-spring:
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://localhost:8081/realms/tpi-backend
