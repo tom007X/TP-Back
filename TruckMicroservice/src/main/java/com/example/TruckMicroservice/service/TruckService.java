@@ -1,6 +1,7 @@
 package com.example.TruckMicroservice.service;
 import com.example.TruckMicroservice.dto.TruckRequestDTO;
 import com.example.TruckMicroservice.dto.TruckResponseDTO;
+import com.example.TruckMicroservice.exception.BadRequestException;
 import com.example.TruckMicroservice.exception.NotFoundException;
 import com.example.TruckMicroservice.exception.TruckDuplicateLicensePlate;
 import com.example.TruckMicroservice.model.Driver;
@@ -14,6 +15,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 @Service
 @RequiredArgsConstructor
@@ -64,6 +66,19 @@ public class TruckService {
             throw new EntityNotFoundException("Truck not found with id " + id);
         }
         repositoryImp.deleteById(id);
+    }
+
+    @Transactional
+    public TruckResponseDTO assignSection(Long idTruck, Double weight, Double volume) {
+        Truck truck = repositoryImp.findById(idTruck)
+                .orElseThrow(() -> new EntityNotFoundException("Truck not found with id " + idTruck));
+
+        if(weight > truck.getMaxWeight()) 
+            throw new BadRequestException("Weight exceeds truck's maximum capacity");
+        if(volume > truck.getMaxVolume())
+            throw new BadRequestException("Volume exceeds truck's maximum capacity");
+
+        return TruckResponseDTO.toDTO(truck);
     }
 
     @Transactional

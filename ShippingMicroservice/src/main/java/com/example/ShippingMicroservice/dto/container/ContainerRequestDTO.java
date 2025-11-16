@@ -1,4 +1,4 @@
-package com.example.ShippingMicroservice.dto;
+package com.example.ShippingMicroservice.dto.container;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;

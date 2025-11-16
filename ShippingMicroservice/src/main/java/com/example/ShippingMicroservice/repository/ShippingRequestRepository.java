@@ -1,6 +1,7 @@
 package com.example.ShippingMicroservice.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -15,5 +16,7 @@ public interface ShippingRequestRepository extends JpaRepository<ShippingRequest
             int status);
 
     boolean existsByIdAndClientId(Long id, Long clientId);
+
+    Optional<ShippingRequest> findByContainer_CodeAndClientId(String containerCode, Long clientId);
 
 }

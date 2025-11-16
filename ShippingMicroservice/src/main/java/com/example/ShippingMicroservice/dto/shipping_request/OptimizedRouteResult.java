@@ -1,4 +1,4 @@
-package com.example.ShippingMicroservice.dto;
+package com.example.ShippingMicroservice.dto.shipping_request;
 
 import java.util.List;
 

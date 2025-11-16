@@ -72,6 +72,8 @@ INSERT INTO container (code, weight, volume, container_state_id, client_id) VALU
 ('CONT005', 1800, 11.0, 2, 5);
 
 INSERT INTO tariff (subject, metric, value, available) VALUES
+('Base',    '_',        100, 1),
 ('Truck',   'distance', 250, 1),
 ('Deposit', 'day',       50, 1),
-('Base',    '_',        100, 1);
+('Container', 'volume',   5, 1),
+('Container', 'weight',   10, 1);

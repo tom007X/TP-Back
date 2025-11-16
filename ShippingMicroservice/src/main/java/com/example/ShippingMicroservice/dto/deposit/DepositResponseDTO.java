@@ -1,7 +1,8 @@
-package com.example.ShippingMicroservice.dto;
+package com.example.ShippingMicroservice.dto.deposit;
 
 import java.math.BigDecimal;
 
+import com.example.ShippingMicroservice.dto.address.AddressResponseDTO;
 import com.example.ShippingMicroservice.model.Deposit;
 
 import lombok.Builder;

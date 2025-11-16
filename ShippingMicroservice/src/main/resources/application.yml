@@ -23,7 +23,7 @@ spring:
 
 google:
   maps:
-    api-key: ${GOOGLE_API_KEY:__}
+    api-key: ${GOOGLE_API_KEY:AIzaSyAzX1ma-i25KjrXbIA9TTdoxWRbE975a3I}
     directions-url: https://maps.googleapis.com/maps/api/directions/json
 server:
   port: 8090

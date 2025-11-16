@@ -22,7 +22,7 @@ public class GlobalHandlerException {
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ApiErrorResponse> handleBadRequestException(BadRequestException ex){
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiErrorResponse(HttpStatus.NOT_FOUND.value(),"Bad request", ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiErrorResponse(HttpStatus.BAD_REQUEST.value(),"Bad request", ex.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

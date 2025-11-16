@@ -13,9 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.ShippingMicroservice.dto.AsignTruckDTO;
-import com.example.ShippingMicroservice.dto.CreateShippingRequestDTO;
-import com.example.ShippingMicroservice.dto.ShippingRequestResponseDTO;
+import com.example.ShippingMicroservice.dto.shipping_request.AsignTruckDTO;
+import com.example.ShippingMicroservice.dto.shipping_request.CreateShippingRequestDTO;
+import com.example.ShippingMicroservice.dto.shipping_request.ShippingRequestResponseDTO;
+import com.example.ShippingMicroservice.service.ContainerService;
 import com.example.ShippingMicroservice.service.ShippingRequestService;
 
 import jakarta.validation.Valid;
@@ -43,7 +44,16 @@ public class ShippingController {
 
         ShippingRequestResponseDTO response = shippingRequestService.getShippingRequest(id, clientId);
         return ResponseEntity.ok(response);
+    }
 
+    @GetMapping("/container/{containerCode}")
+    public ResponseEntity<ShippingRequestResponseDTO> getShippingRequestByContainerCode(
+            @PathVariable String containerCode,
+            @RequestParam Long clientId) {
+
+        ShippingRequestResponseDTO response = shippingRequestService.getShippingRequestByContainerCode(containerCode,
+                clientId);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping
@@ -69,5 +79,23 @@ public class ShippingController {
             @Valid @RequestBody AsignTruckDTO dto) {
         ShippingRequestResponseDTO response = shippingRequestService.asignTruckToSection(requestId, sectionId, dto);
         return ResponseEntity.ok().body(response);
+    }
+
+    @PutMapping("/{requestId}/sections/{sectionId}/start")
+    public ResponseEntity<ShippingRequestResponseDTO> startSection(
+            @PathVariable Long requestId,
+            @PathVariable Long sectionId) {
+
+        ShippingRequestResponseDTO response = shippingRequestService.startSection(requestId, sectionId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{requestId}/sections/{sectionId}/finish")
+    public ResponseEntity<ShippingRequestResponseDTO> finishSection(
+            @PathVariable Long requestId,
+            @PathVariable Long sectionId) {
+
+        ShippingRequestResponseDTO response = shippingRequestService.finishSection(requestId, sectionId);
+        return ResponseEntity.ok(response);
     }
 }
