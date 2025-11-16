@@ -1,21 +1,16 @@
-version: '3.9'
+version: '3.8'
 
 services:
   gateway-service:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: gateway-container
     ports:
-      - "8093:8093"
-    depends_on:
-      - keycloak
-    restart: on-failure
+      - "8093:8093" # puerto interno del gateway → puerto local
     environment:
-      - SERVER_PORT=8093
-      - SPRING_WEBFLUX_BASE_PATH=/api/v1
-      # enable spring security debug logging to trace authentication/authorization
-      - SPRING_SECURITY_DEBUG=true
-      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/tpi-backend
-      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER_URI=http://keycloak:8080/realms/tpi-backend
+      - SPRING_PROFILES_ACTIVE=prod
+      - JAVA_OPTS=-Xms256m -Xmx512m
 
   keycloak:
     image: quay.io/keycloak/keycloak:24.0.3
@@ -31,3 +26,4 @@ services:
 
 volumes:
   keycloak_data:
+

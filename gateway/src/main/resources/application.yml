@@ -1,33 +1,19 @@
-server:
-  port: 8093
-  address: 0.0.0.0
-
 spring:
   application:
     name: gateway
 
-  security:
-    oauth2:
-      client:
-        registration:
-          keycloak:
-            client-id: tpi-backend-client
-            client-secret: ${KEYCLOAK_CLIENT_SECRET:}
-            authorization-grant-type: authorization_code
-            scope: openid,profile,email
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
-        provider:
-          keycloak:
-            # Cambiar a nombre del servicio Docker
-            issuer-uri: http://keycloak:8080/realms/tpi-backend
-
-      resourceserver:
-        jwt:
-          # Cambiar a nombre del servicio Docker
-          issuer-uri: http://keycloak:8080/realms/tpi-backend
+server:
+  port: 8093
 
 routing:
   microservice:
-    trucks: http://host.docker.internal:8090
-    clients: http://host.docker.internal:8091
-    shipping: http://host.docker.internal:8092
+    trucks: http://localhost:8090
+    clients: http://localhost:8091
+    shipping: http://localhost:8092
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8081/realms/tpi-backend
