@@ -56,8 +56,8 @@ public class TruckController {
                                                     @RequestParam boolean available){
         TruckResponseDTO truckUpdate = serviceTruck.updateAvailability(id,available);
         return ResponseEntity.ok(truckUpdate);
-
     }
+    
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTruck(@PathVariable Long id){
         serviceTruck.deleteTruckById(id);

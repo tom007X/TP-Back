@@ -43,31 +43,21 @@ public class ShippingCompositionController {
     }
 
     @GetMapping
-    public Mono<ResponseEntity<List<ShippingRequestResponseDTO>>> getAllShippingRequests() {
-        return webClientShipping.get()
-                .uri("/api/v1/shipping-requests")
-                .exchangeToMono(clientResponse -> clientResponse
-                        .bodyToFlux(ShippingRequestResponseDTO.class)
-                        .collectList()
-                        .map(body -> ResponseEntity
-                                .status(clientResponse.statusCode())
-                                .headers(clientResponse.headers().asHttpHeaders())
-                                .body(body)));
-    }
-
-    @GetMapping
     public Mono<ResponseEntity<List<ShippingRequestResponseDTO>>> getShippingRequestsByClient(
             @RequestParam Long clientId) {
         return validateClientExists(clientId)
                 .then(
                         webClientShipping.get()
-                                .uri("/api/v1/shipping-requests" + "?clientId={clientId}", clientId)
+                                .uri("/api/v1/shipping-requests?clientId={clientId}", clientId)
                                 .exchangeToMono(clientResponse -> clientResponse
                                         .bodyToFlux(ShippingRequestResponseDTO.class)
                                         .collectList()
                                         .map(body -> ResponseEntity
-                                                .status(clientResponse.statusCode())
-                                                .headers(clientResponse.headers().asHttpHeaders())
+                                                .status(clientResponse
+                                                        .statusCode())
+                                                .headers(clientResponse
+                                                        .headers()
+                                                        .asHttpHeaders())
                                                 .body(body))));
     }
 
@@ -83,8 +73,11 @@ public class ShippingCompositionController {
                                         .bodyToMono(ShippingRequestResponseDTO.class)
                                         .defaultIfEmpty(null)
                                         .map(body -> ResponseEntity
-                                                .status(clientResponse.statusCode())
-                                                .headers(clientResponse.headers().asHttpHeaders())
+                                                .status(clientResponse
+                                                        .statusCode())
+                                                .headers(clientResponse
+                                                        .headers()
+                                                        .asHttpHeaders())
                                                 .body(body))));
     }
 
@@ -135,34 +128,37 @@ public class ShippingCompositionController {
 
     }
 
-    @PutMapping("/{requestId}/sections/{sectionId}/asign-truck")
+    @PutMapping("/{requestId}/sections/{sectionId}/asign-truck/{truckId}")
     public Mono<ResponseEntity<ShippingRequestResponseDTO>> asignTruckToSection(
             @PathVariable Long requestId,
             @PathVariable Long sectionId,
-            @Valid @RequestBody AsignTruckDTO dto) {
-
-        Long truckId = dto.getTruckId();
-        if (truckId == null) {
-            return Mono.error(new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "TruckId must be provided in AsignTruckDTO"));
-        }
+            @PathVariable Long truckId) {
 
         return validateTruckExists(truckId)
-                .then(
-                        webClientShipping.put()
-                                .uri("/api/v1/shipping-requests/{requestId}/sections/{sectionId}/asign-truck",
-                                        requestId, sectionId)
-                                .bodyValue(dto)
-                                .exchangeToMono(clientResponse -> clientResponse
-                                        .bodyToMono(ShippingRequestResponseDTO.class)
-                                        .map(body -> ResponseEntity
-                                                .status(clientResponse
-                                                        .statusCode())
-                                                .headers(clientResponse
-                                                        .headers()
-                                                        .asHttpHeaders())
-                                                .body(body))));
+                .flatMap(truckDto -> {
+                    AsignTruckDTO asignTruckDTO = new AsignTruckDTO();
+                    asignTruckDTO.setTruckId(truckId);
+                    asignTruckDTO.setTruckPlate(truckDto.getLicensePlate());
+                    asignTruckDTO.setTruckCostPerKm(truckDto.getCostPerKm());
+
+                    Mono<Void> markTruckUnavailable = webClientTruck.patch()
+                            .uri(uriBuilder -> uriBuilder
+                                    .path("/api/v1/trucks/{id}/availability")
+                                    .queryParam("available", false)
+                                    .build(truckId))
+                            .retrieve()
+                            .toBodilessEntity()
+                            .then();
+
+                    return markTruckUnavailable.then(
+                            webClientShipping.put()
+                                    .uri(uriBuilder -> uriBuilder
+                                            .path("/api/v1/shipping-requests/{requestId}/sections/{sectionId}/asign-truck")
+                                            .build(requestId, sectionId))
+                                    .bodyValue(asignTruckDTO)
+                                    .retrieve()
+                                    .toEntity(ShippingRequestResponseDTO.class));
+                });
     }
 
     private Mono<ClientDTO> validateClientExists(Long clientId) {
