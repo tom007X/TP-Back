@@ -33,9 +33,9 @@ public class ShippingCompositionController {
 
     public ShippingCompositionController(
             WebClient.Builder webClientBuilder,
-            @Value("http://localhost:8090") String uriShipping,
-            @Value("http://localhost:8091") String uriTruck,
-            @Value("http://localhost:8092") String uriClient) {
+            @Value("${routing.microservice.shipping:http://shipping-microservice:8090}") String uriShipping,
+            @Value("${routing.microservice.trucks:http://truck-microservice:8091}") String uriTruck,
+            @Value("${routing.microservice.clients:http://client-microservice:8092}") String uriClient) {
 
         this.webClientShipping = webClientBuilder.baseUrl(uriShipping).build();
         this.webClientTruck = webClientBuilder.baseUrl(uriTruck).build();

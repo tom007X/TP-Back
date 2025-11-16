@@ -42,25 +42,25 @@ public class SecurityConfig {
                 .pathMatchers("/public/**").permitAll()
 
                 // Shipping requests
-                .pathMatchers(HttpMethod.POST, "/api/v1/shipping-requests").hasRole("CLIENT")
-                .pathMatchers(HttpMethod.GET, "/api/v1/shipping-requests/**").hasRole("CLIENT")
+                .pathMatchers(HttpMethod.POST, "/api/v1/shipping-requests").hasRole("CLIENTE")
+                .pathMatchers(HttpMethod.GET, "/api/v1/shipping-requests/**").hasRole("CLIENTE")
 
                 // Addresses
-                .pathMatchers(HttpMethod.POST, "/api/v1/addresses").hasRole("ADMIN")
-                .pathMatchers(HttpMethod.PUT, "/api/v1/addresses/**").hasRole("ADMIN")
+                .pathMatchers(HttpMethod.POST, "/api/v1/addresses").hasRole("ADMINISTRADOR")
+                .pathMatchers(HttpMethod.PUT, "/api/v1/addresses/**").hasRole("ADMINISTRADOR")
 
                 // Deposits
-                .pathMatchers(HttpMethod.POST, "/api/v1/deposits").hasRole("ADMIN")
-                .pathMatchers(HttpMethod.PUT, "/api/v1/deposits/**").hasRole("ADMIN")
+                .pathMatchers(HttpMethod.POST, "/api/v1/deposits").hasRole("ADMINISTRADOR")
+                .pathMatchers(HttpMethod.PUT, "/api/v1/deposits/**").hasRole("ADMINISTRADOR")
 
                 // Trucks
-                .pathMatchers(HttpMethod.GET, "/api/v1/trucks/**").hasRole("ADMIN")
-                .pathMatchers(HttpMethod.POST, "/api/v1/trucks").hasRole("ADMIN")
-                .pathMatchers(HttpMethod.PUT, "/api/v1/trucks/**").hasRole("ADMIN")
+                .pathMatchers(HttpMethod.GET, "/api/v1/trucks/**").hasRole("ADMINISTRADOR")
+                .pathMatchers(HttpMethod.POST, "/api/v1/trucks").hasRole("ADMINISTRADOR")
+                .pathMatchers(HttpMethod.PUT, "/api/v1/trucks/**").hasRole("ADMINISTRADOR")
 
                 // Assign truck to section
                 .pathMatchers(HttpMethod.PUT, "/api/v1/shipping-requests/{requestId}/sections/{sectionId}/asign-truck")
-                    .hasRole("ADMIN")
+                    .hasRole("ADMINISTRADOR")
 
                 // Register start/end of section
                 .pathMatchers(HttpMethod.PUT, "/api/v1/trucks/{id}/availability").hasRole("TRANSPORTISTA")
@@ -83,19 +83,48 @@ public class SecurityConfig {
     private static class KeycloakJwtConverter implements Converter<Jwt, AbstractAuthenticationToken> {
         @Override
         public AbstractAuthenticationToken convert(Jwt jwt) {
-            Map<String, Object> realmAccess = jwt.getClaim("realm_access");
-            List<String> roles = Collections.emptyList();
-            
-            if (realmAccess != null && realmAccess.get("roles") instanceof List) {
-                roles = (List<String>) realmAccess.get("roles");
+            List<GrantedAuthority> authorities = new java.util.ArrayList<>();
+
+            // Extraer roles desde realm_access.roles (si existe)
+            Object realmAccessObj = jwt.getClaim("realm_access");
+            if (realmAccessObj instanceof Map) {
+                Map<?,?> realmAccess = (Map<?,?>) realmAccessObj;
+                Object rolesObj = realmAccess.get("roles");
+                if (rolesObj instanceof Iterable) {
+                    for (Object r : (Iterable<?>) rolesObj) {
+                        String role = String.valueOf(r);
+                        if (!role.isEmpty()) {
+                            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
+                        }
+                    }
+                }
             }
 
-            List<GrantedAuthority> authorities = roles.stream()
-                .map(role -> "ROLE_" + role.toUpperCase())
-                .map(SimpleGrantedAuthority::new)
+            // También extraer roles desde resource_access.{client}.roles (Keycloak puede ponerlos ahí)
+            Object resourceAccessObj = jwt.getClaim("resource_access");
+            if (resourceAccessObj instanceof Map) {
+                Map<?,?> resourceAccess = (Map<?,?>) resourceAccessObj;
+                for (Object clientEntryObj : resourceAccess.values()) {
+                    if (clientEntryObj instanceof Map) {
+                        Map<?,?> clientEntry = (Map<?,?>) clientEntryObj;
+                        Object rolesObj = clientEntry.get("roles");
+                        if (rolesObj instanceof Iterable) {
+                            for (Object r : (Iterable<?>) rolesObj) {
+                                String role = String.valueOf(r);
+                                if (!role.isEmpty()) {
+                                    authorities.add(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            List<GrantedAuthority> distinct = authorities.stream()
+                .distinct()
                 .collect(Collectors.toList());
 
-            return new JwtAuthenticationToken(jwt, authorities);
+            return new JwtAuthenticationToken(jwt, distinct);
         }
     }
 

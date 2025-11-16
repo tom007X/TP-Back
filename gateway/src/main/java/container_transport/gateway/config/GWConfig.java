@@ -20,9 +20,12 @@ public class GWConfig {
 
     @Bean
     public RouteLocator configurarRutas(RouteLocatorBuilder builder,
-                                        @Value("${routing.microservice.trucks}") String uriTrucks,
-                                        @Value("${routing.microservice.clients}") String uriClients,
-                                        @Value("${routing.microservice.shipping}") String uriShipping){
+            @Value("${routing.microservice.trucks}") String uriTrucks,
+            @Value("${routing.microservice.clients}") String uriClients,
+            @Value("${routing.microservice.shipping}") String uriShipping) {
+                System.out.println(">>> uriTrucks = " + uriTrucks);
+                System.out.println(">>> uriClients = " + uriClients);
+                System.out.println(">>> uriShipping = " + uriShipping);
         return builder.routes()
                 .route(p -> p.path("/api/v1/trucks/**").uri(uriTrucks))
                 .route(p -> p.path("/api/v1/drivers/**").uri(uriTrucks))

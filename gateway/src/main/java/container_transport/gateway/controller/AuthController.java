@@ -24,7 +24,7 @@ public class AuthController {
             "&client_id=tpi-backend-client" + "&redirect_uri=" + URLEncoder.encode("http://localhost:8080/api/login/oauth2/code/keycloak", StandardCharsets.UTF_8);
 
             String token = restClient.post()
-                .uri("http://localhost:8081/realms/tpi-backend/protocol/openid-connect/token", StandardCharsets.UTF_8)
+                .uri("http://keycloak:8080/realms/tpi-backend/protocol/openid-connect/token", StandardCharsets.UTF_8)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(formData)
                 .retrieve()
