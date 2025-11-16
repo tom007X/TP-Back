@@ -1,38 +1,14 @@
-# ------------------------------------
-# ETAPA 1: BUILDER (Construcción con Maven y JDK 21)
-# Esta etapa compila el código y genera el JAR.
-# ------------------------------------
-# Usamos una imagen que incluye Maven y JDK 21
-FROM maven:3.9.5-eclipse-temurin-21 AS builder
+# 1️⃣ Imagen base con Java (ajustá la versión según tu proyecto)
+FROM eclipse-temurin:21-jdk-jammy
 
-# Establece el directorio de trabajo
+# 2️⃣ Directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# Copia los archivos de configuración de Maven
-COPY pom.xml .
+# 3️⃣ Copiamos el archivo JAR generado por Spring Boot
+COPY target/gateway-0.0.1-SNAPSHOT.jar app.jar
 
-# Copia el código fuente completo
-COPY src /app/src
-
-# Compila el proyecto, genera el JAR y omite las pruebas
-RUN mvn clean package -DskipTests
-
-# ------------------------------------
-# ETAPA 2: RUN (Ejecución con JRE 21 - Imagen ligera)
-# Esta etapa crea la imagen final, ligera, para ejecutar el JAR.
-# ------------------------------------
-# Usamos una imagen ligera de JRE 21 (Runtime Environment)
-FROM eclipse-temurin:21-jre-jammy
-
-# Directorio de trabajo
-WORKDIR /app
-
-# Copia el JAR generado desde la etapa 'builder'
-# El nombre del JAR es 'gateway-0.0.1-SNAPSHOT.jar'
-COPY --from=builder /app/target/gateway-0.0.1-SNAPSHOT.jar app.jar
-
-# Expone el puerto configurado para el Gateway
+# 4️⃣ Exponemos el puerto donde corre tu app (el mismo que configures en application.yml)
 EXPOSE 8093
 
-# Comando de inicio
+# 5️⃣ Comando de inicio
 ENTRYPOINT ["java", "-jar", "app.jar"]
