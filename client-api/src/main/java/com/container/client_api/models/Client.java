@@ -3,12 +3,9 @@ package com.container.client_api.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Getter @Setter @AllArgsConstructor @NoArgsConstructor
+@Getter @Setter @AllArgsConstructor @NoArgsConstructor @Builder
 @Entity
 @Table(name = "CLIENT")
 public class Client {
@@ -18,15 +15,12 @@ public class Client {
     private Long id;
 
     @Column(nullable = false)
-    @NotBlank
     private String name;
 
     @Column(nullable = false)
-    @NotBlank
     private String surname;
 
     @Column(nullable = false)
-    @NotBlank
     private String phone;
 
 

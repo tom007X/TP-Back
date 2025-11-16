@@ -66,7 +66,7 @@ public class TruckService {
         repositoryImp.deleteById(id);
     }
 
-    @Transactional()
+    @Transactional
     public TruckResponseDTO updateAvailability(Long id, boolean available) {
         Truck truck = repositoryImp.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Truck not found with id " + id));
@@ -76,6 +76,19 @@ public class TruckService {
         return TruckResponseDTO.toDTO(truck);
     }
 
+    @Transactional
+    public TruckResponseDTO assignDriver(Long idTruck, Long idDriver){
+        Truck truck = repositoryImp.findById(idTruck)
+                .orElseThrow(() -> new EntityNotFoundException("Truck not found with id " + idTruck));
+        if (!driverService.existDriverById(idDriver)){
+            throw new EntityNotFoundException("Driver not found with id " + idDriver);
+        }
+        Driver driver = driverService.findDriverEntityById(idDriver);
+
+        truck.setDriver(driver);
+
+        return TruckResponseDTO.toDTO(truck);
+    }
 
 
 }
