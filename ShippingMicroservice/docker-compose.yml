@@ -1,29 +1,47 @@
-version: '3.8'
-
 services:
-  mysql-db:
-    image: mysql:8.0.33 # Utiliza una versión estable de MySQL
-    container_name: mysql-dev-container
+  shipping-request-db:
+    image: mysql:8.0.33
+    container_name: shipping_request_mysql
+    restart: unless-stopped
     environment:
-      # --- Configuraciones Esenciales de MySQL ---
-      # La contraseña del usuario root
       MYSQL_ROOT_PASSWORD: root_1
-      # El nombre de la base de datos que se creará al inicio
       MYSQL_DATABASE: mi_basedatos_app
-      # El nombre del usuario que tendrá permisos en esa base de datos (opcional, pero buena práctica)
       MYSQL_USER: user_1
-      # La contraseña del usuario anterior
       MYSQL_PASSWORD: mi_usUario22
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     ports:
-      # Mapea el puerto interno (3306) al puerto de tu máquina local (3306)
       - "3315:3306"
     volumes:
-      # Persiste los datos en tu máquina local para que no se pierdan al detener el contenedor
-      - mysql_data:/var/lib/mysql
-      # [Opcional] Carga scripts SQL al inicio (ver explicación abajo)
-      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-    restart: unless-stopped
+      - mysql_data_shipping_request:/var/lib/mysql
+    networks:
+      - backend-net-client
 
-# Volúmenes para persistir los datos
+  shipping-microservice:
+    build: .
+    container_name: shipping_microservice_container
+    depends_on:
+      shipping-request-db:
+        condition: service_healthy
+    environment:
+      DB_HOST: shipping-request-db
+      DB_PORT: 3306
+      DB_NAME: mi_basedatos_app
+      DB_USER: user_1
+      DB_PASSWORD: mi_usUario22
+      GOOGLE_API_KEY: AIzaSyAzX1ma-i25KjrXbIA9TTdoxWRbE975a3I
+    ports:
+      - "8090:8090"
+    restart: on-failure
+    networks:
+      - backend-net-client
+
 volumes:
-  mysql_data:
+  mysql_data_shipping_request:
+
+networks:
+  backend-net-client:
+    driver: bridge

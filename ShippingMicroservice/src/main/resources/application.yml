@@ -3,9 +3,9 @@ spring:
     name: Shipping-Microservice
 
   datasource:
-    url: jdbc:mysql://localhost:3315/mi_basedatos_app?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-    username: user_1
-    password: mi_usUario22
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3315}/${DB_NAME:mi_basedatos_app}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: ${DB_USER:user_1}
+    password: ${DB_PASSWORD:mi_usUario22}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -23,7 +23,7 @@ spring:
 
 google:
   maps:
-    api-key: YOUR_API_KEY_HERE
+    api-key: ${GOOGLE_API_KEY:__}
     directions-url: https://maps.googleapis.com/maps/api/directions/json
 server:
   port: 8090
