@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.ShippingMicroservice.dto.DepositRequestDTO;
-import com.example.ShippingMicroservice.dto.DepositResponseDTO;
+import com.example.ShippingMicroservice.dto.deposit.DepositRequestDTO;
+import com.example.ShippingMicroservice.dto.deposit.DepositResponseDTO;
 import com.example.ShippingMicroservice.service.DepositService;
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;

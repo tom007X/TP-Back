@@ -1,6 +1,8 @@
-package com.example.ShippingMicroservice.dto;
+package com.example.ShippingMicroservice.dto.deposit;
 
 import java.math.BigDecimal;
+
+import com.example.ShippingMicroservice.dto.address.AddressRequestDTO;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.AssertTrue;

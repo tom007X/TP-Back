@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.example.ShippingMicroservice.dto.AddressRequestDTO;
-import com.example.ShippingMicroservice.dto.AddressResponseDTO;
-import com.example.ShippingMicroservice.dto.CoordinateDTO;
+import com.example.ShippingMicroservice.dto.address.AddressRequestDTO;
+import com.example.ShippingMicroservice.dto.address.AddressResponseDTO;
+import com.example.ShippingMicroservice.dto.address.CoordinateDTO;
 import com.example.ShippingMicroservice.exception.NotFoundException;
 import com.example.ShippingMicroservice.model.Address;
 import com.example.ShippingMicroservice.repository.AddressRepository;

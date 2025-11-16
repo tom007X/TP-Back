@@ -6,9 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.ShippingMicroservice.dto.AddressRequestDTO;
-import com.example.ShippingMicroservice.dto.AddressResponseDTO;
-import com.example.ShippingMicroservice.dto.CoordinateDTO;
+import com.example.ShippingMicroservice.dto.address.AddressRequestDTO;
+import com.example.ShippingMicroservice.dto.address.AddressResponseDTO;
+import com.example.ShippingMicroservice.dto.address.CoordinateDTO;
 import com.example.ShippingMicroservice.service.AddressService;
 
 import java.util.List;

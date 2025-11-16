@@ -1,4 +1,4 @@
-package com.example.ShippingMicroservice.dto;
+package com.example.ShippingMicroservice.dto.address;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

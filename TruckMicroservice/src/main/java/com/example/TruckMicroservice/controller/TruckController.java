@@ -44,12 +44,19 @@ public class TruckController {
         return ResponseEntity.status(HttpStatus.CREATED).body(truckCreate);
     }
 
-    @PatchMapping("/{id}/assign/{idDriver}")
+    @PatchMapping("/{id}/driver/assign/{idDriver}")
     public ResponseEntity<TruckResponseDTO> assignDriver(@PathVariable("id") Long idTruck,
                                                          @PathVariable("idDriver") Long idDriver){
         TruckResponseDTO truckResponse = serviceTruck.assignDriver(idTruck, idDriver);
         return ResponseEntity.ok(truckResponse);
     }
+
+    @PatchMapping("/{id}//seccion/assign")
+    public ResponseEntity<TruckResponseDTO> assignSection(@PathVariable("id") Long idTruck,
+            @RequestParam Double weight, @RequestParam Double volume) {
+                TruckResponseDTO truckResponse = serviceTruck.assignSection(idTruck, weight, volume);
+                return ResponseEntity.ok(truckResponse);
+            }
 
     @PatchMapping("/{id}/availability")
     public ResponseEntity<TruckResponseDTO> updateAvailibility(@PathVariable Long id,

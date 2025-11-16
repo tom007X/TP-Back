@@ -1,4 +1,4 @@
-package com.example.ShippingMicroservice.dto;
+package com.example.ShippingMicroservice.dto.address;
 
 import com.example.ShippingMicroservice.model.Address;
 

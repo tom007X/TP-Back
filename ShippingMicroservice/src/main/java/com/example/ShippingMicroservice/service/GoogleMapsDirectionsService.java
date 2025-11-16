@@ -12,7 +12,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.ShippingMicroservice.config.GoogleMapsProperties;
 import com.example.ShippingMicroservice.directions.google.GoogleMapsDirectionsResponse;
-import com.example.ShippingMicroservice.dto.OptimizedRouteResult;
+import com.example.ShippingMicroservice.dto.shipping_request.OptimizedRouteResult;
 import com.example.ShippingMicroservice.exception.DirectionsException;
 import com.example.ShippingMicroservice.model.Address;
 import com.example.ShippingMicroservice.model.Deposit;
