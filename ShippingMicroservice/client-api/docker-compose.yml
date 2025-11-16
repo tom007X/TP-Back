@@ -1,0 +1,49 @@
+services:
+
+  client-db:
+    image: mysql:8.0.33
+    container_name: client_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_1
+      MYSQL_DATABASE: mi_basedatos_app
+      MYSQL_USER: user_1
+      MYSQL_PASSWORD: mi_usUario22
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "3320:3306"
+    volumes:
+      - mysql_data_client:/var/lib/mysql
+    networks:
+      - backend-net-client
+
+    # command: --default-authentication-plugin=mysql_native_password
+
+  client-microservice:
+    build: .
+    container_name: client_Microservice
+    depends_on:
+      client-db:
+        condition: service_healthy
+    environment:
+      DB_HOST: client-db
+      DB_PORT: 3306
+      DB_NAME: mi_basedatos_app
+      DB_USER: user_1
+      DB_PASSWORD: mi_usUario22
+    ports:
+      - "8092:8092"
+    restart: always
+    networks:
+      - backend-net-client
+
+volumes:
+  mysql_data_client:
+
+networks:
+  backend-net-client:
+    driver: bridge

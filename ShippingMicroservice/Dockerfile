@@ -1,13 +1,38 @@
-FROM eclipse-temurin:21-jdk-jammy
+# ------------------------------------
+# ETAPA 1: BUILDER (Construcción con Maven y JDK 21)
+# Esta etapa compila el código y genera el JAR.
+# ------------------------------------
+# Usamos una imagen que incluye Maven y JDK 21
+FROM maven:3.9.5-eclipse-temurin-21 AS builder
 
-# 2️⃣ Directorio de trabajo dentro del contenedor
+# Establece el directorio de trabajo
 WORKDIR /app
 
-# 3️⃣ Copiamos el archivo JAR generado por Spring Boot
-COPY target/ShippingMicroservice-0.0.1.jar app.jar
+# Copia los archivos de configuración de Maven
+COPY pom.xml .
 
-# 4️⃣ Exponemos el puerto donde corre tu app (el mismo que configures en application.yml)
+# Copia el código fuente completo
+COPY src /app/src
+
+# Compila el proyecto, genera el JAR y omite las pruebas
+RUN mvn clean package -DskipTests
+
+# ------------------------------------
+# ETAPA 2: RUN (Ejecución con JRE 21 - Imagen ligera)
+# Esta etapa crea la imagen final, ligera, para ejecutar el JAR.
+# ------------------------------------
+# Usamos una imagen ligera de JRE 21 (Runtime Environment)
+FROM eclipse-temurin:21-jre-jammy
+
+# Directorio de trabajo
+WORKDIR /app
+
+# Copia el JAR generado desde la etapa 'builder'
+# El nombre del JAR es 'ShippingMicroservice-0.0.1.jar'
+COPY --from=builder /app/target/ShippingMicroservice-0.0.1.jar app.jar
+
+# Expone el puerto configurado para el Microservicio
 EXPOSE 8090
 
-# 5️⃣ Comando de inicio
+# Comando de inicio
 ENTRYPOINT ["java", "-jar", "app.jar"]

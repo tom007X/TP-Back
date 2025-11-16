@@ -1,0 +1,47 @@
+services:
+  shipping-request-db:
+    image: mysql:8.0.33
+    container_name: shipping_request_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_1
+      MYSQL_DATABASE: mi_basedatos_app
+      MYSQL_USER: user_1
+      MYSQL_PASSWORD: mi_usUario22
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "3315:3306"
+    volumes:
+      - mysql_data_shipping_request:/var/lib/mysql
+    networks:
+      - backend-net-client
+
+  shipping-microservice:
+    build: .
+    container_name: shipping_microservice_container
+    depends_on:
+      shipping-request-db:
+        condition: service_healthy
+    environment:
+      DB_HOST: shipping-request-db
+      DB_PORT: 3306
+      DB_NAME: mi_basedatos_app
+      DB_USER: user_1
+      DB_PASSWORD: mi_usUario22
+      GOOGLE_API_KEY: AIzaSyAzX1ma-i25KjrXbIA9TTdoxWRbE975a3I
+    ports:
+      - "8090:8090"
+    restart: on-failure
+    networks:
+      - backend-net-client
+
+volumes:
+  mysql_data_shipping_request:
+
+networks:
+  backend-net-client:
+    driver: bridge
