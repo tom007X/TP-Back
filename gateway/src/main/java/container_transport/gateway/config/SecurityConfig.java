@@ -37,6 +37,7 @@ public class SecurityConfig {
             ReactiveJwtAuthenticationConverterAdapter jwtAuthenticationConverter) {
 
         http
+            .cors(cors -> cors.disable())
             .csrf(ServerHttpSecurity.CsrfSpec::disable)
             .authorizeExchange(exchanges -> exchanges
                 .pathMatchers("/public/**").permitAll()
@@ -49,8 +50,7 @@ public class SecurityConfig {
 
                 // Clients
                 .pathMatchers(HttpMethod.DELETE, "/api/v1/clients/**").hasRole("ADMINISTRADOR")
-                // .pathMatchers(HttpMethod.GET, "/api/v1/clients/**").hasAnyRole("CLIENTE","ADMINISTRADOR")
-                .pathMatchers(HttpMethod.GET, "/api/v1/clients/**").permitAll()
+                .pathMatchers(HttpMethod.GET, "/api/v1/clients/**").hasAnyRole("CLIENTE","ADMINISTRADOR")
                 .pathMatchers(HttpMethod.POST, "/api/v1/clients").hasRole("ADMINISTRADOR")
                 .pathMatchers(HttpMethod.PUT, "/api/v1/clients/**").hasRole("ADMINISTRADOR")
                 
@@ -76,7 +76,7 @@ public class SecurityConfig {
                 .pathMatchers(HttpMethod.POST, "/api/v1/shipping-requests").hasRole("CLIENTE")
                 .pathMatchers(HttpMethod.GET, "/api/v1/shipping-requests/**").hasRole("CLIENTE")
                     // Assign truck to section
-                    .pathMatchers(HttpMethod.PUT, "/api/v1/shipping-requests/{requestId}/sections/{sectionId}/asign-truck")
+                    .pathMatchers(HttpMethod.PUT, "/api/v1/shipping-requests/{requestId}/sections/{sectionId}/asign-truck/{truckId}")
                         .hasRole("ADMINISTRADOR")
                     // Start and finish section
                     .pathMatchers(HttpMethod.PUT, "/api/v1/shipping-requests/{requestId}/sections/{sectionId}/start")

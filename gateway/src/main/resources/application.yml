@@ -6,7 +6,7 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://keycloak:8080/realms/tpi-backend
-          # jwk-set-uri: http://localhost:8080/realms/tpi-backend/protocol/openid-connect/certs
+          jwk-set-uri: http://keycloak:8080/realms/tpi-backend/protocol/openid-connect/certs
 server:
   port: 8093
 
