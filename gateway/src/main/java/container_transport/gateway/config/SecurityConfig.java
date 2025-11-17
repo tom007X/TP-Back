@@ -47,6 +47,13 @@ public class SecurityConfig {
                 .pathMatchers(HttpMethod.POST, "/api/v1/addresses").hasRole("ADMINISTRADOR")
                 .pathMatchers(HttpMethod.PUT, "/api/v1/addresses/**").hasRole("ADMINISTRADOR")
 
+                // Clients
+                .pathMatchers(HttpMethod.DELETE, "/api/v1/clients/**").hasRole("ADMINISTRADOR")
+                // .pathMatchers(HttpMethod.GET, "/api/v1/clients/**").hasAnyRole("CLIENTE","ADMINISTRADOR")
+                .pathMatchers(HttpMethod.GET, "/api/v1/clients/**").permitAll()
+                .pathMatchers(HttpMethod.POST, "/api/v1/clients").hasRole("ADMINISTRADOR")
+                .pathMatchers(HttpMethod.PUT, "/api/v1/clients/**").hasRole("ADMINISTRADOR")
+                
                 // Containers
                 .pathMatchers(HttpMethod.DELETE, "/api/v1/containers/**").hasRole("ADMINISTRADOR")
                 .pathMatchers(HttpMethod.GET, "/api/v1/containers/**").hasAnyRole("CLIENTE","ADMINISTRADOR")
