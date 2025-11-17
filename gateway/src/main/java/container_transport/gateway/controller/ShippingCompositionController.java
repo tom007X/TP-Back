@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.server.ResponseStatusException;
 
 import container_transport.gateway.dto.clients.ClientDTO;
@@ -46,20 +48,14 @@ public class ShippingCompositionController {
     public Mono<ResponseEntity<List<ShippingRequestResponseDTO>>> getShippingRequestsByClient(
             @RequestParam Long clientId) {
         return validateClientExists(clientId)
-                .then(
-                        webClientShipping.get()
-                                .uri("/api/v1/shipping-requests?clientId={clientId}",
-                                        clientId)
-                                .exchangeToMono(clientResponse -> clientResponse
-                                        .bodyToFlux(ShippingRequestResponseDTO.class)
-                                        .collectList()
-                                        .map(body -> ResponseEntity
-                                                .status(clientResponse
-                                                        .statusCode())
-                                                .headers(clientResponse
-                                                        .headers()
-                                                        .asHttpHeaders())
-                                                .body(body))));
+                .then(webClientShipping.get()
+                        .uri("/api/v1/shipping-requests?clientId={clientId}", clientId)
+                        .retrieve()
+                        .onStatus(
+                                status -> status.is4xxClientError() || status.is5xxServerError(),
+                                response -> handleErrorResponse(response, "fetching shipping requests"))
+                        .toEntityList(ShippingRequestResponseDTO.class))
+                .onErrorResume(this::handleError);
     }
 
     @GetMapping("/{id}")
@@ -67,19 +63,19 @@ public class ShippingCompositionController {
             @PathVariable Long id, @RequestParam Long clientId) {
 
         return validateClientExists(clientId)
-                .then(
-                        webClientShipping.get()
-                                .uri("/api/v1/shipping-requests/{id}", id)
-                                .exchangeToMono(clientResponse -> clientResponse
-                                        .bodyToMono(ShippingRequestResponseDTO.class)
-                                        .defaultIfEmpty(null)
-                                        .map(body -> ResponseEntity
-                                                .status(clientResponse
-                                                        .statusCode())
-                                                .headers(clientResponse
-                                                        .headers()
-                                                        .asHttpHeaders())
-                                                .body(body))));
+                .then(webClientShipping.get()
+                        .uri("/api/v1/shipping-requests/{id}", id)
+                        .retrieve()
+                        .onStatus(
+                                status -> status == HttpStatus.NOT_FOUND,
+                                resp -> Mono.error(new ResponseStatusException(
+                                        HttpStatus.NOT_FOUND,
+                                        "Shipping request with ID " + id + " not found.")))
+                        .onStatus(
+                                status -> status.is4xxClientError() || status.is5xxServerError(),
+                                response -> handleErrorResponse(response, "fetching shipping request"))
+                        .toEntity(ShippingRequestResponseDTO.class))
+                .onErrorResume(this::handleError);
     }
 
     @GetMapping("/container/{containerCode}")
@@ -88,61 +84,68 @@ public class ShippingCompositionController {
             @RequestParam Long clientId) {
 
         return validateClientExists(clientId)
-                .then(
-                        webClientShipping.get()
-                                .uri(uriBuilder -> uriBuilder
-                                        .path("/api/v1/shipping-requests/container/{containerCode}")
-                                        .queryParam("clientId", clientId)
-                                        .build(containerCode))
-                                .retrieve()
-                                .toEntity(ShippingRequestResponseDTO.class));
+                .then(webClientShipping.get()
+                        .uri(uriBuilder -> uriBuilder
+                                .path("/api/v1/shipping-requests/container/{containerCode}")
+                                .queryParam("clientId", clientId)
+                                .build(containerCode))
+                        .retrieve()
+                        .onStatus(
+                                status -> status == HttpStatus.NOT_FOUND,
+                                resp -> Mono.error(new ResponseStatusException(
+                                        HttpStatus.NOT_FOUND,
+                                        "Shipping request with container code " + containerCode + " not found.")))
+                        .onStatus(
+                                status -> status.is4xxClientError() || status.is5xxServerError(),
+                                response -> handleErrorResponse(response, "fetching shipping request by container"))
+                        .toEntity(ShippingRequestResponseDTO.class))
+                .onErrorResume(this::handleError);
     }
 
     @PostMapping
     public Mono<ResponseEntity<ShippingRequestResponseDTO>> createShippingRequest(
             @Valid @RequestBody CreateShippingRequestDTO dto) {
-        Mono<ClientDTO> clientMono = validateClientExists(dto.getClientId());
-
-        return clientMono.flatMap(client -> {
-            return webClientShipping.post()
-                    .uri("/api/v1/shipping-requests")
-                    .bodyValue(dto)
-                    .exchangeToMono(clientResponse -> {
-                        if (clientResponse.statusCode().isError()) {
-                            return clientResponse
-                                    .bodyToMono(ShippingRequestResponseDTO.class)
-                                    .flatMap(errorBody -> Mono.just(
-                                            ResponseEntity.status(
-                                                    clientResponse.statusCode())
-                                                    .headers(clientResponse
-                                                            .headers()
-                                                            .asHttpHeaders())
-                                                    .body(errorBody)));
-                        }
-                        return clientResponse.bodyToMono(ShippingRequestResponseDTO.class)
-                                .map(successBody -> ResponseEntity
-                                        .status(clientResponse.statusCode())
-                                        .headers(clientResponse.headers()
-                                                .asHttpHeaders())
-                                        .body(successBody));
-                    });
-        });
+        
+        return validateClientExists(dto.getClientId())
+                .flatMap(client -> webClientShipping.post()
+                        .uri("/api/v1/shipping-requests")
+                        .bodyValue(dto)
+                        .retrieve()
+                        .onStatus(
+                                status -> status == HttpStatus.BAD_REQUEST,
+                                response -> handleErrorResponse(response, "creating shipping request"))
+                        .onStatus(
+                                status -> status.is4xxClientError() || status.is5xxServerError(),
+                                response -> handleErrorResponse(response, "creating shipping request"))
+                        .toEntity(ShippingRequestResponseDTO.class))
+                .onErrorResume(this::handleError);
     }
 
     @PutMapping("/{id}/cancel")
     public Mono<ResponseEntity<ShippingRequestResponseDTO>> cancelShippingRequest(
             @PathVariable Long id,
             @RequestParam Long clientId) {
+        
         return validateClientExists(clientId)
-                .then(
-                        webClientShipping.put()
-                                .uri(uriBuilder -> uriBuilder
-                                        .path("/api/v1/shipping-requests/{id}/cancel")
-                                        .queryParam("clientId", clientId)
-                                        .build(id))
-                                .exchangeToMono(clientResponse -> clientResponse
-                                        .toEntity(ShippingRequestResponseDTO.class)));
-
+                .then(webClientShipping.put()
+                        .uri(uriBuilder -> uriBuilder
+                                .path("/api/v1/shipping-requests/{id}/cancel")
+                                .queryParam("clientId", clientId)
+                                .build(id))
+                        .retrieve()
+                        .onStatus(
+                                status -> status == HttpStatus.NOT_FOUND,
+                                resp -> Mono.error(new ResponseStatusException(
+                                        HttpStatus.NOT_FOUND,
+                                        "Shipping request with ID " + id + " not found.")))
+                        .onStatus(
+                                status -> status == HttpStatus.BAD_REQUEST,
+                                response -> handleErrorResponse(response, "canceling shipping request"))
+                        .onStatus(
+                                status -> status.is4xxClientError() || status.is5xxServerError(),
+                                response -> handleErrorResponse(response, "canceling shipping request"))
+                        .toEntity(ShippingRequestResponseDTO.class))
+                .onErrorResume(this::handleError);
     }
 
     @PutMapping("/{requestId}/sections/{sectionId}/asign-truck/{truckId}")
@@ -164,6 +167,9 @@ public class ShippingCompositionController {
                                     .queryParam("available", false)
                                     .build(truckId))
                             .retrieve()
+                            .onStatus(
+                                    status -> status.is4xxClientError() || status.is5xxServerError(),
+                                    response -> handleErrorResponse(response, "updating truck availability"))
                             .toBodilessEntity()
                             .then();
 
@@ -174,8 +180,15 @@ public class ShippingCompositionController {
                                             .build(requestId, sectionId))
                                     .bodyValue(asignTruckDTO)
                                     .retrieve()
+                                    .onStatus(
+                                            status -> status == HttpStatus.BAD_REQUEST,
+                                            response -> handleErrorResponse(response, "assigning truck to section"))
+                                    .onStatus(
+                                            status -> status.is4xxClientError() || status.is5xxServerError(),
+                                            response -> handleErrorResponse(response, "assigning truck to section"))
                                     .toEntity(ShippingRequestResponseDTO.class));
-                });
+                })
+                .onErrorResume(this::handleError);
     }
 
     @PutMapping("/{requestId}/sections/{sectionId}/start")
@@ -188,7 +201,14 @@ public class ShippingCompositionController {
                         .path("/api/v1/shipping-requests/{requestId}/sections/{sectionId}/start")
                         .build(requestId, sectionId))
                 .retrieve()
-                .toEntity(ShippingRequestResponseDTO.class);
+                .onStatus(
+                        status -> status == HttpStatus.BAD_REQUEST,
+                        response -> handleErrorResponse(response, "starting section"))
+                .onStatus(
+                        status -> status.is4xxClientError() || status.is5xxServerError(),
+                        response -> handleErrorResponse(response, "starting section"))
+                .toEntity(ShippingRequestResponseDTO.class)
+                .onErrorResume(this::handleError);
     }
 
     @PutMapping("/{requestId}/sections/{sectionId}/finish")
@@ -201,8 +221,17 @@ public class ShippingCompositionController {
                         .path("/api/v1/shipping-requests/{requestId}/sections/{sectionId}/finish")
                         .build(requestId, sectionId))
                 .retrieve()
-                .toEntity(ShippingRequestResponseDTO.class);
+                .onStatus(
+                        status -> status == HttpStatus.BAD_REQUEST,
+                        response -> handleErrorResponse(response, "finishing section"))
+                .onStatus(
+                        status -> status.is4xxClientError() || status.is5xxServerError(),
+                        response -> handleErrorResponse(response, "finishing section"))
+                .toEntity(ShippingRequestResponseDTO.class)
+                .onErrorResume(this::handleError);
     }
+
+    // ========== HELPER METHODS ==========
 
     private Mono<ClientDTO> validateClientExists(Long clientId) {
         return webClientClient.get()
@@ -213,6 +242,9 @@ public class ShippingCompositionController {
                         resp -> Mono.error(new ResponseStatusException(
                                 HttpStatus.BAD_REQUEST,
                                 "Client with ID " + clientId + " not found.")))
+                .onStatus(
+                        status -> status.is4xxClientError() || status.is5xxServerError(),
+                        response -> handleErrorResponse(response, "validating client"))
                 .bodyToMono(ClientDTO.class);
     }
 
@@ -225,6 +257,56 @@ public class ShippingCompositionController {
                         resp -> Mono.error(new ResponseStatusException(
                                 HttpStatus.BAD_REQUEST,
                                 "Truck with ID " + truckId + " not found.")))
+                .onStatus(
+                        status -> status.is4xxClientError() || status.is5xxServerError(),
+                        response -> handleErrorResponse(response, "validating truck"))
                 .bodyToMono(TruckResponseDTO.class);
+    }
+
+    /**
+     * Handles error responses from downstream microservices
+     */
+    private Mono<Throwable> handleErrorResponse(
+            ClientResponse response,
+            String operation) {
+        
+       return response.bodyToMono(String.class)
+                .map(errorBody -> {
+                    HttpStatus status = (HttpStatus) response.statusCode();
+                    String message = String.format("Error %s: %s - %s", 
+                            operation, 
+                            status.value(), 
+                            errorBody);
+                    
+                    return (Throwable) new ResponseStatusException(status, message);
+                })
+                .defaultIfEmpty((Throwable) new ResponseStatusException(
+                        (HttpStatus) response.statusCode(),
+                        "Error " + operation + ": " + response.statusCode()))
+                .flatMap(Mono::error);
+    }
+
+    /**
+     * Generic error handler that converts various exceptions to appropriate HTTP responses
+     */
+    private <T> Mono<ResponseEntity<T>> handleError(Throwable error) {
+        if (error instanceof ResponseStatusException) {
+            ResponseStatusException rse = (ResponseStatusException) error;
+            return Mono.just(ResponseEntity
+                    .status(rse.getStatusCode())
+                    .body(null));
+        }
+        
+        if (error instanceof WebClientResponseException) {
+            WebClientResponseException wcre = (WebClientResponseException) error;
+            return Mono.just(ResponseEntity
+                    .status(wcre.getStatusCode())
+                    .body(null));
+        }
+        
+        // Default to 500 Internal Server Error for unexpected exceptions
+        return Mono.just(ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(null));
     }
 }
